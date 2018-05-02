@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>A-Frame Simple-Keyboard slice editor</title>
+<style>
+  body{
+    background: #ccc;
+    font: 13px sans-serif;
+  }
+  canvas{
+    background: gray;
+  }
+  blockquote{
+    font: 12px monospace;
+    margin: 0;
+    background: #bbb;
+    padding: 10px;
+  }
+</style>
+</head>
+<body>
+<h3>Simple Keyboard slices editor</h3>
+<p>Drag a keyboard image on the page. <a href="#">Shortcuts</a></p>
+<canvas id="c"></canvas>
+
+<h3>JSON:</h3>
+<blockquote id="output"></blockquote>
+
+<script>
+  
+var can = document.getElementById('c');
+var c = can.getContext('2d');
+
+var img = new Image();
+img.onload = function(ev){
+  can.width = img.width;
+  can.height = img.height;
+  c.drawImage(img, 0, 0);
+}
+img.src = "./sk-basic.png";
+
+var x, y; // mouse coords
+var slices = [];
+var drawing = false;
+var dragging = null;
+var hovering = null;
+var dragx, dragy;
+
+var SNAP_DISTANCE = 10;
+var hguides = [];
+var vguides = [];
+
+function getSliceOn(x, y){
+  for (var i = 0; i < slices.length; i++) {
+    var s = slices[i];
+    if (x >= s.x && y >= s.y && x < s.x + s.w && y < s.y + s.h) return s;
+  }
+  return null;
+}
+
+document.addEventListener('keydown', function(ev){
+//  console.log(ev);
+  if (drawing) drawing.key = ev.key;
+  if (dragging) {
+    dragging.key = ev.key;
+    if (ev.keyCode == 46 || ev.keyCode == 8) { // supr, del
+      if (dragging){
+        for (var i = 0; i < slices.length; i++) {
+          if (slices[i] == dragging) {
+            slices.splice(i, 1);
+            dragging = null;
+          }
+        }
+      }
+    }
+  }
+  else if (ev.keyCode == 67){ // c
+    hguides = [];
+    vguides = [];
+  }
+  else if (ev.keyCode == 72){ // h
+    hguides.push(y);
+  }
+  else if (ev.keyCode == 86){ // v
+    vguides.push(x);
+  }
+  redraw();
+});
+
+can.addEventListener('mousedown', function(ev){
+  x = ev.offsetX;
+  y = ev.offsetY;
+
+  snapToGuides();
+
+  dragging = getSliceOn(x,y);
+  if (dragging) {
+    dragx = x - dragging.x;
+    dragy = y - dragging.y;
+  }
+  else{
+    drawing = {x: x, y: y, key: ' '};
+  }
+  redraw();
+});
+
+can.addEventListener('mousemove', function(ev){
+  x = ev.offsetX;
+  y = ev.offsetY;
+  
+  snapToGuides();
+
+  if (!dragging && !drawing) {
+    hovering = getSliceOn(x,y);
+    can.style.cursor = hovering ? 'pointer' : 'default';
+  }
+
+  if (dragging){
+    dragging.x = x - dragx;
+    dragging.y = y - dragy;
+  }
+
+  if (drawing){
+    drawing.w = x - drawing.x;
+    drawing.h = y - drawing.y;
+  }
+
+  redraw();
+});
+
+can.addEventListener('mouseup', function(ev){
+  x = ev.offsetX;
+  y = ev.offsetY;
+
+  snapToGuides();
+
+  if (dragging){
+    dragging = null;
+  }
+
+  if (drawing) {
+    if (drawing.w < 0) { drawing.x += drawing.w; drawing.w *= -1; }
+    if (drawing.h < 0) { drawing.y += drawing.h; drawing.h *= -1; }
+    if (drawing.w > 2 && drawing.h > 2){
+      slices.push(drawing);
+    }
+    drawing = false;
+  }
+
+  redraw();
+});
+
+
+function snapToGuides(){
+  for (var i = 0; i < hguides.length; i++) {
+    if (Math.abs(hguides[i] - y) < SNAP_DISTANCE){
+      y = hguides[i];
+      break;
+    }
+  }
+  for (var i = 0; i < vguides.length; i++) {
+    if (Math.abs(vguides[i] - x) < SNAP_DISTANCE){
+      x = vguides[i];
+      break;
+    }
+  }
+}
+
+function trimf(n){
+  return Math.floor(n * 1000) / 1000;
+}
+
+function redraw(){
+  can.width = img.width;
+  c.drawImage(img, 0, 0);
+  c.globalAlpha = 0.3;
+  c.strokeStyle = "#ff0";
+  c.lineWidth = 1;
+  output = '[';
+
+  for (var i = 0; i < slices.length; i++) {
+    var s = slices[i];
+    c.fillStyle = s == dragging ? "#ff0" : "#800";
+    c.fillRect(s.x, s.y, s.w, s.h);
+
+    output += `{"key":"${s.key}", "x":${trimf(s.x / can.width)}, "y":${trimf(s.y / can.height)}, "w":${trimf(s.w / can.width)}, "h":${trimf(s.h / can.height)}}, `
+  }
+  if (hovering){
+    c.strokeRect(hovering.x, hovering.y, hovering.w, hovering.h);
+  }
+  if (drawing){
+    c.fillStyle = "#ff0";
+    c.fillRect(drawing.x + 0.5, drawing.y + 0.5, drawing.w, drawing.h);
+  }
+
+  c.strokeStyle = "#fff";
+  c.beginPath();
+  for (var i = 0; i < hguides.length; i++) {
+    c.moveTo(0, hguides[i] + 0.5);
+    c.lineTo(can.width, hguides[i] + 0.5);
+  }
+  for (var i = 0; i < vguides.length; i++) {
+    c.moveTo(vguides[i] + 0.5, 0);
+    c.lineTo(vguides[i] + 0.5, can.height);
+  }
+  c.stroke();
+
+  c.globalAlpha = 1;
+  document.getElementById('output').innerHTML = output + ']';
+}
+
+</script>
+</body>
+</html>

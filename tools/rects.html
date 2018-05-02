@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>A-Frame Simple-Keyboard slice editor</title>
+<style>
+  body{
+    background: #ccc;
+    font: 13px sans-serif;
+  }
+  canvas{
+    background: gray;
+  }
+  blockquote{
+    font: 12px monospace;
+    margin: 0;
+    background: #bbb;
+    padding: 10px;
+  }
+</style>
+</head>
+<body>
+<h3>Simple Keyboard slices editor</h3>
+<p>Drag a keyboard image on the page. <a href="#">Shortcuts</a></p>
+<canvas id="c"></canvas>
+
+<h3>JSON:</h3>
+<blockquote id="output"></blockquote>
+
+<script>
+  
+var can = document.getElementById('c');
+var c = can.getContext('2d');
+var im;
+
+var img = new Image();
+img.onload = function(ev){
+  can.width = img.width;
+  can.height = img.height;
+  c.drawImage(img, 0, 0);
+  im = c.getImageData(0, 0, can.width, can.height).data;
+}
+img.src = "./sk-basic-keys.png";
+
+var selected = false;
+var slices = [];
+
+
+document.addEventListener('keydown', function(ev){
+  if (selected){
+    selected.key = ev.key;
+    redraw();
+  }
+});
+
+function getSliceOn(x, y){
+  for (var i = 0; i < slices.length; i++) {
+    var s = slices[i];
+    if (x >= s.x && y >= s.y && x < s.x + s.w && y < s.y + s.h) return s;
+  }
+  return null;
+}
+
+function getRect(x, y){
+  var red = im[y * 4 * can.width + x * 4];
+  if (red == 0) return null;
+  var col;
+  var x1, y1, x2, y2;
+  col = red; for(x1 = x; col == red; x1--){ col = im[y * can.width * 4 + x1 * 4]; }; x1++;
+  col = red; for(y1 = y; col == red; y1--){ col = im[y1 * can.width * 4 + x * 4]; }; y1++;
+  col = red; for(x2 = x; col == red; x2++){ col = im[y * can.width * 4 + x2 * 4]; }; x2++;
+  col = red; for(y2 = y; col == red; y2++){ col = im[y2 * can.width * 4 + x * 4]; }; y2++;
+
+  return {x: x1, y: y1, w: x2 - x1 - 1, h: y2 - y1 - 1};
+}
+
+can.addEventListener('mousedown', function(ev){
+  var x = ev.offsetX;
+  var y = ev.offsetY;
+  var s = getSliceOn(x, y); 
+  if (s){
+    selected = s;
+    redraw();
+    return;
+  }
+  var rect = getRect(x,y);
+  if (rect){
+    selected = {key: '', x: rect.x, y: rect.y, w: rect.w, h: rect.h};
+    slices.push(selected);
+    redraw();
+  }
+})
+
+function trimf(n){
+  return Math.floor(n * 1000) / 1000;
+}
+
+function redraw(){
+  can.width = img.width;
+  c.drawImage(img, 0, 0);
+  c.globalAlpha = 0.3;
+  c.font = "30px Arial";
+  c.strokeStyle = "#fff";
+  c.lineWidth = 2;
+  output = '[';
+
+  for (var i = 0; i < slices.length; i++) {
+    var s = slices[i];
+    c.fillStyle = "#FF0";
+    c.fillRect(s.x, s.y, s.w, s.h);
+    c.fillStyle = "#000";
+    c.fillText(s.key, s.x+5, s.y+30);
+    output += `{"key":"${s.key}", "x":${trimf(s.x / can.width)}, "y":${trimf(s.y / can.height)}, "w":${trimf(s.w / can.width)}, "h":${trimf(s.h / can.height)}}, `
+  }
+
+  c.globalAlpha = 1;
+  if (selected){
+    c.strokeRect(selected.x, selected.y, selected.w, selected.h);
+  }
+
+  document.getElementById('output').innerHTML = output + ']';
+}
+
+</script>
+</body>
+</html>
