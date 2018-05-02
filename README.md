@@ -11,7 +11,21 @@ For [A-Frame](https://aframe.io).
 
 | Property | Description | Default Value |
 | -------- | ----------- | ------------- |
-|          |             |               |
+| label |   |  <empty string> |
+| labelColor |   |  #aaa |
+| labelBgColor |   |  #000 |
+| bgColor |   |  #000 |
+| hoverColor |   |  #1A407F |
+| pressColor |   |  #5290F6 |
+| fontColor |   |  #6699ff |
+| keyboardColor |   |  #6699ff |
+| maxlength |   |  0 (no maximum) |
+| model |   | 'basic' |
+| width |   | 0.5 (meters) |
+| value |   |  <empty string> |
+| interval |   |  50 |
+| filters |   | <none> |
+| font |   | 'aileronsemibold' |
 
 ### Installation
 

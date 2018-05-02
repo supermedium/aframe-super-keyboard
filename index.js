@@ -150,8 +150,7 @@ AFRAME.registerComponent('simple-keyboard', {
       this.rawValue = this.data.value;
       this.defaultValue = this.data.value;
       this.textInput.setAttribute('text', {value: this.filter(this.data.value)});
-    }
-    else{
+    } else {
       this.textInput.setAttribute('text', {value: this.filter(this.rawValue)});
     }
 
