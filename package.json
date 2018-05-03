@@ -70,5 +70,10 @@
       "examples/build.js",
       "dist/**"
     ]
+  },
+  "dependencies": {
+    "rollup": "^0.58.2",
+    "uglify-js": "^3.3.23",
+    "uglifyjs": "^2.4.11"
   }
 }

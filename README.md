@@ -11,7 +11,7 @@ For [A-Frame](https://aframe.io).
 
 | Property | Description | Default Value |
 | -------- | ----------- | ------------- |
-| label |   |  <empty string> |
+| label |   |  [empty string] |
 | labelColor |   |  #aaa |
 | labelBgColor |   |  #000 |
 | bgColor |   |  #000 |
@@ -22,9 +22,9 @@ For [A-Frame](https://aframe.io).
 | maxlength |   |  0 (no maximum) |
 | model |   | 'basic' |
 | width |   | 0.5 (meters) |
-| value |   |  <empty string> |
+| value |   |  [empty string] |
 | interval |   |  50 |
-| filters |   | <none> |
+| filters |   | [none] |
 | font |   | 'aileronsemibold' |
 
 ### Installation
@@ -42,7 +42,7 @@ Install and use by directly including the [browser files](dist):
 
 <body>
   <a-scene>
-    <a-entity simple-keyboard="foo: bar"></a-entity>
+    <a-entity simple-keyboard></a-entity>
   </a-scene>
 </body>
 ```
