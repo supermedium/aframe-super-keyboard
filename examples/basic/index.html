@@ -4,14 +4,28 @@
     <meta charset="utf-8">
     <title>A-Frame Simple Keyboard for A-Frame Component - Basic</title>
     <meta name="description" content="Basic example for Simple Keyboard for A-Frame component."></meta>
-    <script src="https://aframe.io/releases/0.6.0/aframe.min.js"></script>
+    <script src="https://rawgit.com/aframevr/aframe/c4aa63e/dist/aframe-master.min.js"></script>
     <script src="../../dist/aframe-simple-keyboard-component.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
   </head>
   <body>
     <a-scene environment="preset: contact; skyColor: #112214; horizonColor: #478d54; ground: hills; groundColor: #4f3e4b; dressing: none; grid: crosses">
-      <a-entity simple-keyboard="imagePath:../../dist/" position="0 1.5 -0.5" rotation="-10 0 0"></a-entity>
+
+      <a-entity
+        vive-controls="hand: right" 
+        daydream-controls="hand: right" 
+        oculus-touch-controls="hand: right"
+        windows-motion-controls="hand: right"
+      >
+        <a-sphere radius="0.03"></a-sphere>
+      </a-entity>
+
+      <a-entity id="keyboard" simple-keyboard="imagePath:../../dist/" position="0 1.076 -0.5" rotation="-30 0 0"></a-entity>
+
     </a-scene>
+
+
+
 
     <!-- GitHub Corner. -->
     <a href="https://github.com/feiss/aframe-simple-keyboard" class="github-corner">

@@ -5,7 +5,7 @@
 
 Lightweight and functional keyboard for VR
 
-For [A-Frame](https://aframe.io).
+For [A-Frame](https://aframe.io) 0.8.1 and newer.
 
 ### API
 

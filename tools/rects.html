@@ -40,7 +40,7 @@ img.onload = function(ev){
   c.drawImage(img, 0, 0);
   im = c.getImageData(0, 0, can.width, can.height).data;
 }
-img.src = "./sk-basic-keys.png";
+img.src = "./sk-basic2-keys.png";
 
 var selected = false;
 var slices = [];
@@ -48,6 +48,7 @@ var slices = [];
 
 document.addEventListener('keydown', function(ev){
   if (selected){
+    ev.preventDefault();
     selected.key = ev.key;
     redraw();
   }
