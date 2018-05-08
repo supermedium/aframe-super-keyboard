@@ -18,7 +18,7 @@ AFRAME.registerComponent('simple-keyboard', {
     width: {default: 0.8},
     align: {default: 'left', oneOf:['left', 'center', 'right']},
     value: {type: 'string', default: ''},
-    interval: {type: 'int', default: 20},
+    interval: {type: 'int', default: 50},
     filters: {type: 'array'},
     font: {default: 'aileronsemibold'}, // roboto aileronsemibold dejavu exo2bold exo2semibold kelsonsans monoid sourcecodepro
     imagePath: {default: '.'},
