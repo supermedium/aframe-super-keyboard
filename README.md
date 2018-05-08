@@ -7,6 +7,8 @@ Lightweight and functional keyboard for VR
 
 For [A-Frame](https://aframe.io) 0.8.1 and newer.
 
+![example image](https://raw.githubusercontent.com/feiss/aframe-simple-keyboard-component/master/examples/basic/thumb.jpg)
+
 ### API
 
 | Property | Description | Default Value |
