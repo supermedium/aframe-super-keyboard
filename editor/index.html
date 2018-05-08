@@ -205,7 +205,7 @@ function redraw(){
   can.width = img.width;
   c.drawImage(img, 0, 0);
   c.globalAlpha = 0.3;
-  c.font = "30px Arial";
+  c.font = "40px Arial";
   c.strokeStyle = "#fff";
   c.lineWidth = 4;
   output = '[';
@@ -215,7 +215,7 @@ function redraw(){
     c.fillStyle = "#FF0";
     c.fillRect(s.x, s.y, s.w, s.h);
     c.fillStyle = "#000";
-    c.fillText(tr(s.key), s.x+5, s.y+30);
+    c.fillText(tr(s.key), s.x+10, s.y+40);
     output += `{"key":"${s.key}", "x":${trimf(s.x / can.width)}, "y":${trimf(s.y / can.height)}, "w":${trimf(s.w / can.width)}, "h":${trimf(s.h / can.height)}}, `
   }
   output = output.substr(0, output.length - 2);
