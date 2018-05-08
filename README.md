@@ -13,12 +13,11 @@ For [A-Frame](https://aframe.io) 0.8.1 and newer.
 | -------- | ----------- | ------------- |
 | label |   |  [empty string] |
 | labelColor |   |  #aaa |
-| labelBgColor |   |  #000 |
-| bgColor |   |  #000 |
-| hoverColor |   |  #1A407F |
-| pressColor |   |  #5290F6 |
-| fontColor |   |  #6699ff |
-| keyboardColor |   |  #6699ff |
+| inputColor |   |  #6699ff |
+| keyColor |   |  #6699ff |
+| keyBgColor |   |  #000 |
+| keyHoverColor |   |  #1A407F |
+| keyPressColor |   |  #5290F6 |
 | maxlength |   |  0 (no maximum) |
 | model |   | 'basic' |
 | width |   | 0.5 (meters) |

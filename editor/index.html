@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>A-Frame Simple-Keyboard Layout Editor</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono:600" rel="stylesheet">
+<style>
+  body{
+    background: #eee;
+    font: 14px 'Roboto Slab', sans-serif;
+    line-height: 1.8em;
+    color: #314;
+    margin: 4em 5%;
+  }
+  h1, h2, h3, h4{
+    color: #73a;
+    margin-top: 2em;
+  }
+  a{
+    color: #73a;
+    text-decoration: none;
+    border-bottom: 1px solid #73a;
+  }
+  a:hover{
+    color: #C266F2;
+    border-bottom: 1px solid #C266F2;
+  }
+  canvas{
+    background: gray;
+    width: 100%;
+  }
+  blockquote{
+    font: 14px 'IBM Plex Mono', monospace;
+    margin: 0;
+    background: #E6DFEB;
+    padding: 10px;
+    color: #73a;
+  }
+  ul{
+    padding-left: 2em;
+  }
+  dt{
+    float: left;
+    width: 10em;
+    font-weight: bold;
+  }
+  dl{
+    line-height: 1.8em;
+    padding-left: 1em;
+  }
+  code{
+    font-family: 'IBM Plex Mono', monospace;
+    color: #73a;
+    background: #E6DFEB;
+  }
+  footer{
+    margin-top: 3em;
+  }
+</style>
+</head>
+<body>
+<h1>AFrame-Simple-Keyboard-Component Layout Editor</h1>
+<p>Drag in or select a keyboard image <br>
+  <input type="file" onchange="loadImage(this.files.item(0))">
+</p>
+<canvas id="c"></canvas>
+
+<h2>Code</h2>
+<blockquote id="output"></blockquote>
+
+<h3>Tips</h3>
+<ul>
+  <li>Click on the image to create a slice, and press a key to assign the value it produces.</li>
+  <li>Remember to add a slice with <code>Insert</code> key for the input box</li>
+  <li>When finished, copy&amp;paste the code in simple-keyboard <code>this.KEYBOARDS.layout</code>.</li>
+  
+</ul>
+<h3>Special keys</h3>
+<dl>
+  <dt>Ctrl+Del</dt>
+  <dd>Delete selected slice</dd>
+  <dt>slice + Enter</dt> 
+  <dd>Key slice for accepting the text entered and close the keyboard.</dd>
+  <dt>slice + Del</dt>
+  <dd>Key slice for backspace (delete last character introduced)</dd>
+  <dt>slice + Escape</dt>
+  <dd>Key slice for dismiss the text and close the keyboard (cancel)</dd>
+  <dt>slice + Insert</dt>
+  <dd>Key slice for defining the input text area</dd>
+</dl>
+
+<p>
+  See <a href="http://supermedium.github.io/aframe-simple-keyboard-component">examples</a>, contribute and send issues to the <a href="http://github.com/supermedium/aframe-simple-keyboard-component">GitHub repo</a>
+</p>
+
+<footer><a href="https://supermedium.com">Supermedium.com</a></footer>
+
+<script>
+  
+var can = document.getElementById('c');
+var c = can.getContext('2d');
+var im;
+var zoom = 1;
+
+var img = new Image();
+
+img.onload = function(ev){
+  if (img.width != img.height * 2) {
+    alert("WARNING: simple-keyboard expects images with double width than height (eg. 2048 x 1024)");
+  }
+  can.width = img.width;
+  can.height = img.height;
+  c.drawImage(img, 0, 0);
+  im = c.getImageData(0, 0, can.width, can.height).data;
+  updateZoom();
+}
+
+img.src = "./sk-basic-keys.png";
+
+var selected = false;
+var slices = [];
+
+
+window.addEventListener('resize', updateZoom);
+
+function updateZoom(){
+  if (!img) return;
+  var w;
+  if(can.offsetWidth) { w = can.offsetWidth; } 
+  else if(can.style.pixelWidth) { w = can.style.pixelWidth; }
+
+  zoom = w / img.width;
+}
+
+document.addEventListener('keydown', function(ev){
+  if (ev.keyCode == 46 && ev.ctrlKey){ // ctrl+del
+    if (selected){
+      slices.splice(slices.indexOf(selected), 1);
+      selected = false;
+      redraw();
+    }
+    return;
+  }
+  if (ev.ctrlKey || ev.altKey) return;
+  if (selected){
+    ev.preventDefault();
+    selected.key = ev.key;
+    redraw();
+  }
+});
+
+function getSliceOn(x, y){
+  for (var i = 0; i < slices.length; i++) {
+    var s = slices[i];
+    if (x >= s.x && y >= s.y && x < s.x + s.w && y < s.y + s.h) return s;
+  }
+  return null;
+}
+
+function getRect(x, y){
+  var red = im[y * 4 * can.width + x * 4];
+  if (red == 0) return null;
+  var col;
+  var x1, y1, x2, y2;
+  col = red; for(x1 = x; col == red; x1--){ col = im[y * can.width * 4 + x1 * 4]; }; x1++;
+  col = red; for(y1 = y; col == red; y1--){ col = im[y1 * can.width * 4 + x * 4]; }; y1++;
+  col = red; for(x2 = x; col == red; x2++){ col = im[y * can.width * 4 + x2 * 4]; }; x2++;
+  col = red; for(y2 = y; col == red; y2++){ col = im[y2 * can.width * 4 + x * 4]; }; y2++;
+
+  return {x: x1, y: y1, w: x2 - x1 - 1, h: y2 - y1 - 1};
+}
+
+can.addEventListener('mousedown', function(ev){
+  var x = parseInt(ev.offsetX / zoom);
+  var y = parseInt(ev.offsetY / zoom);
+  var s = getSliceOn(x, y); 
+  if (s){
+    selected = s;
+    redraw();
+    return;
+  }
+  var rect = getRect(x,y);
+  if (rect){
+    selected = {key: '', x: rect.x, y: rect.y, w: rect.w, h: rect.h};
+    slices.push(selected);
+    redraw();
+  }
+})
+
+function trimf(n){
+  return Math.floor(n * 1000) / 1000;
+}
+
+function tr(key){
+  switch(key){
+    case ' ': return 'Space'; break;
+    case 'Insert': return 'Input text'; break;
+    case 'Escape': return 'Dismiss'; break;
+    default: return key;
+  }
+}
+
+function redraw(){
+  can.width = img.width;
+  c.drawImage(img, 0, 0);
+  c.globalAlpha = 0.3;
+  c.font = "30px Arial";
+  c.strokeStyle = "#fff";
+  c.lineWidth = 4;
+  output = '[';
+
+  for (var i = 0; i < slices.length; i++) {
+    var s = slices[i];
+    c.fillStyle = "#FF0";
+    c.fillRect(s.x, s.y, s.w, s.h);
+    c.fillStyle = "#000";
+    c.fillText(tr(s.key), s.x+5, s.y+30);
+    output += `{"key":"${s.key}", "x":${trimf(s.x / can.width)}, "y":${trimf(s.y / can.height)}, "w":${trimf(s.w / can.width)}, "h":${trimf(s.h / can.height)}}, `
+  }
+  output = output.substr(0, output.length - 2);
+
+  c.globalAlpha = 1;
+  if (selected){
+    c.strokeRect(selected.x, selected.y, selected.w, selected.h);
+  }
+
+  document.getElementById('output').innerHTML = output + ']';
+}
+
+
+function loadImage(file){
+  var reader = new FileReader();
+  reader.onload = function (event) {
+    img.src = event.target.result;
+  }
+  reader.readAsDataURL(file);
+}
+
+// drag'n drop
+
+var dropArea = document.body;
+
+dropArea.addEventListener('dragover', function (event) {
+  event.stopPropagation();
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'copy';
+}, false);
+
+dropArea.addEventListener('drop', function (event) {
+  event.stopPropagation();
+  event.preventDefault();
+
+  loadImage(event.dataTransfer.files[0]);
+}, false);
+
+</script>
+</body>
+</html>

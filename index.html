@@ -4,20 +4,25 @@
     <meta charset="utf-8">
     <title>A-Frame Simple Keyboard for A-Frame Component</title>
     <meta name="description" content="Lightweight and functional keyboard for VR"></meta>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
     <style>
       html {
-        background: #33425B;
+        background: #252027;
         color: #FAFAFA;
-        font-family: monospace;
-        font-size: 20px;
-        padding: 10px 20px;
+        font-family: 'Roboto Slab', monospace;
+        font-size: 16px;
+        padding: 20px 10%;
       }
       h1 {
+        color: #8f9;
         font-weight: 300;
       }
       a {
-        color: #FAFAFA;
+        color: #8f9;
         padding: 15px 0;
+      }
+      a:hover{
+        color: #fafafa;
       }
       ul {
         list-style: none;
@@ -27,9 +32,17 @@
         margin-right: 30px;
         padding: 5px 0 30px;
       }
+      ul li img{
+        width: 180px;
+        margin-right: 2em;
+        vertical-align: middle;
+      }
       ul a {
         background-size: cover;
         margin-right: 20px;
+      }
+      ul img:hover{
+        box-shadow: 0 0 4px #8f9;
       }
       ul h3,
       ul p {
@@ -41,8 +54,25 @@
     <h1>A-Frame Simple Keyboard for A-Frame Component</h1>
 
     <ul>
-      <li> <a href="examples/basic">Basic</a> This is a basic example. </li>
-      <li> <a href="examples/customfilter">Custom filter</a> Using a custom filter (password filter).</li>
+      <li> 
+        <a href="examples/basic"><img src="examples/basic/thumb.jpg">Basic</a>
+        Default values.
+      </li>
+      <li> 
+        <a href="examples/numpad"> <img src="examples/numpad/thumb.jpg">Numpad</a> 
+        Numeric pad.</li> 
+      <li>
+        <a href="examples/customfilter"><img src="examples/customfilter/thumb.jpg">Custom filter</a>
+        Using a custom filter (password filter).
+      </li>
+      <li> 
+        <a href="examples/wood"><img src="examples/wood/thumb.jpg">Fantasy Wood</a>
+        Custom layout and keyboard image.
+      </li>
+      <li> 
+        <a href="/editor"><img src="examples/editor.jpg">Layout editor</a>
+        Layout editor for custom keyboards.
+      </li>
     </ul>
 
     <!-- GitHub Corner. -->

@@ -8,13 +8,12 @@ AFRAME.registerComponent('simple-keyboard', {
   schema: {
     label: {type: 'string', default: ''},
     labelColor: {type: 'color', default: '#aaa'},
-    labelBgColor: {type: 'color', default: '#000'},
-    bgColor: {type: 'color', default: '#000'},
-    hoverColor: {type: 'color', default: '#1A407F'},
-    pressColor: {type: 'color', default: '#5290F6'},
-    fontColor: {type: 'color', default: '#6699ff'},
-    keyboardColor: {type: 'color', default: '#6699ff'},
-    maxlength: {type: 'int', default: 0},
+    inputColor: {type: 'color', default: '#6699ff'},
+    keyColor: {type: 'color', default: '#6699ff'},
+    keyBgColor: {type: 'color', default: '#000'},
+    keyHoverColor: {type: 'color', default: '#1A407F'},
+    keyPressColor: {type: 'color', default: '#5290F6'},
+    maxLength: {type: 'int', default: 0},
     model: {default: 'basic'},
     width: {default: 0.8},
     align: {default: 'left', oneOf:['left', 'center', 'right']},
@@ -34,7 +33,7 @@ AFRAME.registerComponent('simple-keyboard', {
   init: function(){
     this.KEYBOARDS = {
       'basic': {wrapCount: 30, inputOffsetY: 0.008, inputOffsetX: 0.08, img: this.data.imagePath + "/sk-basic.png", layout: [{"key":"1", "x":0.044, "y":0.226, "w":0.079, "h":0.152}, {"key":"2", "x":0.124, "y":0.226, "w":0.079, "h":0.152}, {"key":"3", "x":0.203, "y":0.226, "w":0.079, "h":0.152}, {"key":"4", "x":0.282, "y":0.226, "w":0.08, "h":0.152}, {"key":"5", "x":0.363, "y":0.226, "w":0.079, "h":0.152}, {"key":"6", "x":0.442, "y":0.226, "w":0.079, "h":0.152}, {"key":"7", "x":0.521, "y":0.226, "w":0.079, "h":0.152}, {"key":"8", "x":0.601, "y":0.226, "w":0.08, "h":0.152}, {"key":"9", "x":0.681, "y":0.226, "w":0.079, "h":0.152}, {"key":"0", "x":0.761, "y":0.226, "w":0.079, "h":0.152}, {"key":"Delete", "x":0.846, "y":0.227, "w":0.108, "h":0.146}, {"key":"Enter", "x":0.847, "y":0.526, "w":0.108, "h":0.244}, {"key":"q", "x":0.044, "y":0.377, "w":0.079, "h":0.152}, {"key":"w", "x":0.124, "y":0.377, "w":0.079, "h":0.152}, {"key":"e", "x":0.203, "y":0.377, "w":0.079, "h":0.152}, {"key":"r", "x":0.282, "y":0.377, "w":0.08, "h":0.152}, {"key":"t", "x":0.363, "y":0.377, "w":0.079, "h":0.152}, {"key":"y", "x":0.442, "y":0.377, "w":0.079, "h":0.152}, {"key":"u", "x":0.521, "y":0.377, "w":0.079, "h":0.152}, {"key":"i", "x":0.601, "y":0.377, "w":0.08, "h":0.152}, {"key":"o", "x":0.681, "y":0.377, "w":0.079, "h":0.152}, {"key":"p", "x":0.761, "y":0.377, "w":0.079, "h":0.152}, {"key":"l", "x":0.729, "y":0.53, "w":0.08, "h":0.154}, {"key":"a", "x":0.092, "y":0.53, "w":0.08, "h":0.154}, {"key":"s", "x":0.171, "y":0.53, "w":0.08, "h":0.154}, {"key":"d", "x":0.251, "y":0.53, "w":0.08, "h":0.154}, {"key":"f", "x":0.331, "y":0.53, "w":0.079, "h":0.154}, {"key":"g", "x":0.41, "y":0.53, "w":0.08, "h":0.154}, {"key":"h", "x":0.49, "y":0.53, "w":0.079, "h":0.154}, {"key":"j", "x":0.57, "y":0.53, "w":0.079, "h":0.154}, {"key":"k", "x":0.649, "y":0.53, "w":0.08, "h":0.154}, {"key":"z", "x":0.172, "y":0.684, "w":0.079, "h":0.154}, {"key":"x", "x":0.251, "y":0.684, "w":0.08, "h":0.154}, {"key":"c", "x":0.331, "y":0.684, "w":0.079, "h":0.154}, {"key":"v", "x":0.41, "y":0.684, "w":0.08, "h":0.154}, {"key":"b", "x":0.49, "y":0.684, "w":0.08, "h":0.154}, {"key":"n", "x":0.57, "y":0.684, "w":0.079, "h":0.154}, {"key":"m", "x":0.649, "y":0.684, "w":0.08, "h":0.154}, {"key":" ", "x":0.27, "y":0.838, "w":0.415, "h":0.126}, {"key":"Shift", "x":0.042, "y":0.827, "w":0.068, "h":0.142}, {"key":"Escape", "x":0.876, "y":0.823, "w":0.078, "h":0.134}, {"key":"Insert", "x":0.058, "y":0, "w":0.881, "h":0.149}]},
-      'numeric': {}
+      'numpad': {wrapCount: 20, inputOffsetY: 0.005, inputOffsetX: 0.32, img: this.data.imagePath + "/sk-numpad.png", layout: [{"key":"7", "x":0.313, "y":0.254, "w":0.088, "h":0.177}, {"key":"8", "x":0.401, "y":0.254, "w":0.088, "h":0.177}, {"key":"9", "x":0.49, "y":0.254, "w":0.088, "h":0.177}, {"key":"4", "x":0.313, "y":0.431, "w":0.088, "h":0.177}, {"key":"5", "x":0.401, "y":0.431, "w":0.088, "h":0.177}, {"key":"6", "x":0.49, "y":0.431, "w":0.088, "h":0.177}, {"key":"2", "x":0.401, "y":0.608, "w":0.088, "h":0.177}, {"key":"1", "x":0.313, "y":0.608, "w":0.088, "h":0.177}, {"key":"3", "x":0.49, "y":0.608, "w":0.088, "h":0.177}, {"key":"0", "x":0.313, "y":0.785, "w":0.177, "h":0.161}, {"key":".", "x":0.49, "y":0.785, "w":0.088, "h":0.161}, {"key":"Escape", "x":0.578, "y":0.785, "w":0.105, "h":0.161}, {"key":"Enter", "x":0.578, "y":0.431, "w":0.105, "h":0.354}, {"key":"Delete", "x":0.578, "y":0.254, "w":0.105, "h":0.177}, {"key":"Insert", "x":0.294, "y":0.001, "w":0.409, "h":0.19}]}
     };
 
     this.keys = null;
@@ -60,12 +59,12 @@ AFRAME.registerComponent('simple-keyboard', {
     this.el.appendChild(this.label);
 
     this.textInput = document.createElement('a-entity');
-    this.textInput.setAttribute('text', {align: this.data.align, font: this.data.font, value: this.data.value, color: this.data.fontColor, width: this.data.width, wrapCount:20});
+    this.textInput.setAttribute('text', {align: this.data.align, font: this.data.font, value: this.data.value, color: this.data.inputColor, width: this.data.width, wrapCount:20});
     this.el.appendChild(this.textInput);
 
     this.cursor = document.createElement('a-entity');
     this.cursor.setAttribute('position', {x: 0, y: 0, z: 0.001});
-    this.cursor.setAttribute('material', {shader: 'flat', color: this.data.fontColor});
+    this.cursor.setAttribute('material', {shader: 'flat', color: this.data.inputColor});
     this.textInput.appendChild(this.cursor);
     this.cursorUpdated = false;
 
@@ -130,6 +129,9 @@ AFRAME.registerComponent('simple-keyboard', {
         case 'title':
           str = str.split(' ').map(function(s) {return s[0].toUpperCase() + s.substr(1)}).join(' ');
           break;
+        case 'numbers':
+          str = str.split('').filter(function(c) {return !isNaN(parseInt(c)) || c == '.'}).join('');
+          break;
         case 'first':
           str = str[0].toUpperCase() + str.substr(1);
           break;
@@ -138,7 +140,7 @@ AFRAME.registerComponent('simple-keyboard', {
           break;
       }
     }
-    return this.data.maxlength > 0 ? str.substr(0, this.data.maxlength) : str;
+    return this.data.maxLength > 0 ? str.substr(0, this.data.maxLength) : str;
   },
 
   click: function(ev){
@@ -155,20 +157,20 @@ AFRAME.registerComponent('simple-keyboard', {
       break;
       case 'Shift':
         this.shift = !this.shift;
-        this.keyHover.el.setAttribute('material', {color: this.shift ? this.data.hoverColor : this.data.bgColor});
+        this.keyHover.el.setAttribute('material', {color: this.shift ? this.data.keyHoverColor : this.data.keyBgColor});
         return;
       break;
       case 'Escape':
         this.dismiss();
       break;
       default:
-        if (this.data.maxlength > 0 && this.rawValue.length > this.data.maxlength) { break; }
+        if (this.data.maxLength > 0 && this.rawValue.length > this.data.maxLength) { break; }
         this.rawValue += this.shift ? this.keyHover.key.toUpperCase() : this.keyHover.key;
         this.data.value = this.filter(this.rawValue);
         this.textInput.setAttribute('text', {value: this.data.value});
       break;
     }
-    this.keyHover.el.setAttribute('material', {color: this.data.pressColor});
+    this.keyHover.el.setAttribute('material', {color: this.data.keyPressColor});
     this.updateCursorPosition();
   },
 
@@ -199,7 +201,7 @@ AFRAME.registerComponent('simple-keyboard', {
 
   blur: function(ev) {
     this.focused = false;
-    if (this.keyHover && this.keyHover.key != 'Shift') this.keyHover.el.setAttribute('material', {color: this.data.bgColor});
+    if (this.keyHover && this.keyHover.key != 'Shift') this.keyHover.el.setAttribute('material', {color: this.data.keyBgColor});
     this.keyHover = null;
   },
 
@@ -279,7 +281,7 @@ AFRAME.registerComponent('simple-keyboard', {
     }
 
     this.kbImg.setAttribute('geometry', {primitive: 'plane', width: w, height: h});
-    this.kbImg.setAttribute('material', {shader: 'flat', src: kbdata.img, color: this.data.keyboardColor, transparent: true});
+    this.kbImg.setAttribute('material', {shader: 'flat', src: kbdata.img, color: this.data.keyColor, transparent: true});
 
     this.label.setAttribute('text', {value: this.data.label, color: this.data.labelColor, width: this.data.width});
     this.label.setAttribute('position', {x: 0, y: 0.3 * w, z: -0.02});
@@ -302,7 +304,7 @@ AFRAME.registerComponent('simple-keyboard', {
       key.setAttribute('data-key', kdata.key);
       key.setAttribute('position', {x: kdata.x * w - w2 + keyw / 2, y: (1 - kdata.y) * h - h2 - keyh / 2, z: 0})
       key.setAttribute('geometry', {primitive: 'plane', width: keyw, height: keyh});
-      key.setAttribute('material', {shader: 'flat', color: this.data.bgColor, transparent: true});
+      key.setAttribute('material', {shader: 'flat', color: this.data.keyBgColor, transparent: true});
       kdata.el = key;
       key.addEventListener('loaded', function(ev){
         ev.target.object3D.children[0].material.blending = THREE.AdditiveBlending;
@@ -313,7 +315,7 @@ AFRAME.registerComponent('simple-keyboard', {
     var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
     if (this.data.align === 'right') inputx *= -1;
 
-    this.textInput.setAttribute('text', {font: this.data.font, color: this.data.fontColor, width: w, wrapCount: kbdata.wrapCount, align: this.data.align});
+    this.textInput.setAttribute('text', {font: this.data.font, color: this.data.inputColor, width: w, wrapCount: kbdata.wrapCount, align: this.data.align});
     this.textInput.setAttribute('position', {
       x: inputx,
       y: (w / 4) - (this.inputRect.y + this.inputRect.h / 2) * w / 2 + kbdata.inputOffsetY * w, 
@@ -361,8 +363,8 @@ AFRAME.registerComponent('simple-keyboard', {
         var k = keys[i];
         if (!k.el) continue;
         if (uv.x > k.x && uv.x < k.x + k.w && (1.0 - uv.y) > k.y && (1.0 - uv.y) < k.y + k.h) {
-          if (this.keyHover && (this.keyHover.key != 'Shift' || !this.shift)) this.keyHover.el.setAttribute('material', {color: this.data.bgColor});
-          k.el.setAttribute('material', {color: this.data.hoverColor});
+          if (this.keyHover && (this.keyHover.key != 'Shift' || !this.shift)) this.keyHover.el.setAttribute('material', {color: this.data.keyBgColor});
+          k.el.setAttribute('material', {color: this.data.keyHoverColor});
           this.keyHover = k;
           break;
         }
