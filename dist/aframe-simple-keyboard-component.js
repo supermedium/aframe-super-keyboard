@@ -24,11 +24,12 @@
       width: {default: 0.8},
       align: {default: 'left', oneOf:['left', 'center', 'right']},
       value: {type: 'string', default: ''},
-      interval: {type: 'int', default: 20},
+      interval: {type: 'int', default: 50},
       filters: {type: 'array'},
       font: {default: 'aileronsemibold'}, // roboto aileronsemibold dejavu exo2bold exo2semibold kelsonsans monoid sourcecodepro
       imagePath: {default: '.'},
       blinkingSpeed: {type: 'int', default: 400},
+      hand: {type: 'selector'},
       show: {default: true}
     },
 
@@ -36,10 +37,15 @@
       this.userFilterFunc = f;
     },
 
+    addCustomModel: function(name, model){
+      if (!name) return;
+      this.KEYBOARDS[name] = model;
+    },
+
     init: function(){
       this.KEYBOARDS = {
-        'basic': {wrapCount: 30, inputOffsetY: 0.008, inputOffsetX: 0.08, img: this.data.imagePath + "/sk-basic.png", layout: [{"key":"1", "x":0.044, "y":0.226, "w":0.079, "h":0.152}, {"key":"2", "x":0.124, "y":0.226, "w":0.079, "h":0.152}, {"key":"3", "x":0.203, "y":0.226, "w":0.079, "h":0.152}, {"key":"4", "x":0.282, "y":0.226, "w":0.08, "h":0.152}, {"key":"5", "x":0.363, "y":0.226, "w":0.079, "h":0.152}, {"key":"6", "x":0.442, "y":0.226, "w":0.079, "h":0.152}, {"key":"7", "x":0.521, "y":0.226, "w":0.079, "h":0.152}, {"key":"8", "x":0.601, "y":0.226, "w":0.08, "h":0.152}, {"key":"9", "x":0.681, "y":0.226, "w":0.079, "h":0.152}, {"key":"0", "x":0.761, "y":0.226, "w":0.079, "h":0.152}, {"key":"Delete", "x":0.846, "y":0.227, "w":0.108, "h":0.146}, {"key":"Enter", "x":0.847, "y":0.526, "w":0.108, "h":0.244}, {"key":"q", "x":0.044, "y":0.377, "w":0.079, "h":0.152}, {"key":"w", "x":0.124, "y":0.377, "w":0.079, "h":0.152}, {"key":"e", "x":0.203, "y":0.377, "w":0.079, "h":0.152}, {"key":"r", "x":0.282, "y":0.377, "w":0.08, "h":0.152}, {"key":"t", "x":0.363, "y":0.377, "w":0.079, "h":0.152}, {"key":"y", "x":0.442, "y":0.377, "w":0.079, "h":0.152}, {"key":"u", "x":0.521, "y":0.377, "w":0.079, "h":0.152}, {"key":"i", "x":0.601, "y":0.377, "w":0.08, "h":0.152}, {"key":"o", "x":0.681, "y":0.377, "w":0.079, "h":0.152}, {"key":"p", "x":0.761, "y":0.377, "w":0.079, "h":0.152}, {"key":"l", "x":0.729, "y":0.53, "w":0.08, "h":0.154}, {"key":"a", "x":0.092, "y":0.53, "w":0.08, "h":0.154}, {"key":"s", "x":0.171, "y":0.53, "w":0.08, "h":0.154}, {"key":"d", "x":0.251, "y":0.53, "w":0.08, "h":0.154}, {"key":"f", "x":0.331, "y":0.53, "w":0.079, "h":0.154}, {"key":"g", "x":0.41, "y":0.53, "w":0.08, "h":0.154}, {"key":"h", "x":0.49, "y":0.53, "w":0.079, "h":0.154}, {"key":"j", "x":0.57, "y":0.53, "w":0.079, "h":0.154}, {"key":"k", "x":0.649, "y":0.53, "w":0.08, "h":0.154}, {"key":"z", "x":0.172, "y":0.684, "w":0.079, "h":0.154}, {"key":"x", "x":0.251, "y":0.684, "w":0.08, "h":0.154}, {"key":"c", "x":0.331, "y":0.684, "w":0.079, "h":0.154}, {"key":"v", "x":0.41, "y":0.684, "w":0.08, "h":0.154}, {"key":"b", "x":0.49, "y":0.684, "w":0.08, "h":0.154}, {"key":"n", "x":0.57, "y":0.684, "w":0.079, "h":0.154}, {"key":"m", "x":0.649, "y":0.684, "w":0.08, "h":0.154}, {"key":" ", "x":0.27, "y":0.838, "w":0.415, "h":0.126}, {"key":"Shift", "x":0.042, "y":0.827, "w":0.068, "h":0.142}, {"key":"Escape", "x":0.876, "y":0.823, "w":0.078, "h":0.134}, {"key":"Insert", "x":0.058, "y":0, "w":0.881, "h":0.149}]},
-        'numpad': {wrapCount: 20, inputOffsetY: 0.005, inputOffsetX: 0.32, img: this.data.imagePath + "/sk-numpad.png", layout: [{"key":"7", "x":0.313, "y":0.254, "w":0.088, "h":0.177}, {"key":"8", "x":0.401, "y":0.254, "w":0.088, "h":0.177}, {"key":"9", "x":0.49, "y":0.254, "w":0.088, "h":0.177}, {"key":"4", "x":0.313, "y":0.431, "w":0.088, "h":0.177}, {"key":"5", "x":0.401, "y":0.431, "w":0.088, "h":0.177}, {"key":"6", "x":0.49, "y":0.431, "w":0.088, "h":0.177}, {"key":"2", "x":0.401, "y":0.608, "w":0.088, "h":0.177}, {"key":"1", "x":0.313, "y":0.608, "w":0.088, "h":0.177}, {"key":"3", "x":0.49, "y":0.608, "w":0.088, "h":0.177}, {"key":"0", "x":0.313, "y":0.785, "w":0.177, "h":0.161}, {"key":".", "x":0.49, "y":0.785, "w":0.088, "h":0.161}, {"key":"Escape", "x":0.578, "y":0.785, "w":0.105, "h":0.161}, {"key":"Enter", "x":0.578, "y":0.431, "w":0.105, "h":0.354}, {"key":"Delete", "x":0.578, "y":0.254, "w":0.105, "h":0.177}, {"key":"Insert", "x":0.294, "y":0.001, "w":0.409, "h":0.19}]}
+        'basic': {wrapCount: 30, inputOffsetY: 0.008, inputOffsetX: 0.08, img: "sk-basic.png", layout: [{"key":"1", "x":0.044, "y":0.226, "w":0.079, "h":0.152}, {"key":"2", "x":0.124, "y":0.226, "w":0.079, "h":0.152}, {"key":"3", "x":0.203, "y":0.226, "w":0.079, "h":0.152}, {"key":"4", "x":0.282, "y":0.226, "w":0.08, "h":0.152}, {"key":"5", "x":0.363, "y":0.226, "w":0.079, "h":0.152}, {"key":"6", "x":0.442, "y":0.226, "w":0.079, "h":0.152}, {"key":"7", "x":0.521, "y":0.226, "w":0.079, "h":0.152}, {"key":"8", "x":0.601, "y":0.226, "w":0.08, "h":0.152}, {"key":"9", "x":0.681, "y":0.226, "w":0.079, "h":0.152}, {"key":"0", "x":0.761, "y":0.226, "w":0.079, "h":0.152}, {"key":"Delete", "x":0.846, "y":0.227, "w":0.108, "h":0.146}, {"key":"Enter", "x":0.847, "y":0.526, "w":0.108, "h":0.244}, {"key":"q", "x":0.044, "y":0.377, "w":0.079, "h":0.152}, {"key":"w", "x":0.124, "y":0.377, "w":0.079, "h":0.152}, {"key":"e", "x":0.203, "y":0.377, "w":0.079, "h":0.152}, {"key":"r", "x":0.282, "y":0.377, "w":0.08, "h":0.152}, {"key":"t", "x":0.363, "y":0.377, "w":0.079, "h":0.152}, {"key":"y", "x":0.442, "y":0.377, "w":0.079, "h":0.152}, {"key":"u", "x":0.521, "y":0.377, "w":0.079, "h":0.152}, {"key":"i", "x":0.601, "y":0.377, "w":0.08, "h":0.152}, {"key":"o", "x":0.681, "y":0.377, "w":0.079, "h":0.152}, {"key":"p", "x":0.761, "y":0.377, "w":0.079, "h":0.152}, {"key":"l", "x":0.729, "y":0.53, "w":0.08, "h":0.154}, {"key":"a", "x":0.092, "y":0.53, "w":0.08, "h":0.154}, {"key":"s", "x":0.171, "y":0.53, "w":0.08, "h":0.154}, {"key":"d", "x":0.251, "y":0.53, "w":0.08, "h":0.154}, {"key":"f", "x":0.331, "y":0.53, "w":0.079, "h":0.154}, {"key":"g", "x":0.41, "y":0.53, "w":0.08, "h":0.154}, {"key":"h", "x":0.49, "y":0.53, "w":0.079, "h":0.154}, {"key":"j", "x":0.57, "y":0.53, "w":0.079, "h":0.154}, {"key":"k", "x":0.649, "y":0.53, "w":0.08, "h":0.154}, {"key":"z", "x":0.172, "y":0.684, "w":0.079, "h":0.154}, {"key":"x", "x":0.251, "y":0.684, "w":0.08, "h":0.154}, {"key":"c", "x":0.331, "y":0.684, "w":0.079, "h":0.154}, {"key":"v", "x":0.41, "y":0.684, "w":0.08, "h":0.154}, {"key":"b", "x":0.49, "y":0.684, "w":0.08, "h":0.154}, {"key":"n", "x":0.57, "y":0.684, "w":0.079, "h":0.154}, {"key":"m", "x":0.649, "y":0.684, "w":0.08, "h":0.154}, {"key":" ", "x":0.27, "y":0.838, "w":0.415, "h":0.126}, {"key":"Shift", "x":0.042, "y":0.827, "w":0.068, "h":0.142}, {"key":"Escape", "x":0.876, "y":0.823, "w":0.078, "h":0.134}, {"key":"Insert", "x":0.058, "y":0, "w":0.881, "h":0.149}]},
+        'numpad': {wrapCount: 20, inputOffsetY: 0.005, inputOffsetX: 0.32, img: "sk-numpad.png", layout: [{"key":"7", "x":0.313, "y":0.254, "w":0.088, "h":0.177}, {"key":"8", "x":0.401, "y":0.254, "w":0.088, "h":0.177}, {"key":"9", "x":0.49, "y":0.254, "w":0.088, "h":0.177}, {"key":"4", "x":0.313, "y":0.431, "w":0.088, "h":0.177}, {"key":"5", "x":0.401, "y":0.431, "w":0.088, "h":0.177}, {"key":"6", "x":0.49, "y":0.431, "w":0.088, "h":0.177}, {"key":"2", "x":0.401, "y":0.608, "w":0.088, "h":0.177}, {"key":"1", "x":0.313, "y":0.608, "w":0.088, "h":0.177}, {"key":"3", "x":0.49, "y":0.608, "w":0.088, "h":0.177}, {"key":"0", "x":0.313, "y":0.785, "w":0.177, "h":0.161}, {"key":".", "x":0.49, "y":0.785, "w":0.088, "h":0.161}, {"key":"Escape", "x":0.578, "y":0.785, "w":0.105, "h":0.161}, {"key":"Enter", "x":0.578, "y":0.431, "w":0.105, "h":0.354}, {"key":"Delete", "x":0.578, "y":0.254, "w":0.105, "h":0.177}, {"key":"Insert", "x":0.294, "y":0.001, "w":0.409, "h":0.19}]}
       };
 
       this.keys = null;
@@ -92,7 +98,14 @@
     },
 
     setupHand: function(){
-      this.hand = document.querySelector('[vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] > [raycaster]');
+      var eventListenersAdded = this.hand !== null;
+
+      if (this.data.hand) {
+        this.hand = this.data.hand;
+      }
+      else {
+        this.hand = document.querySelector('[vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] > [raycaster]');
+      }
       if (!this.hand){
         console.error('Simple-Keyboard: no controller found. Add an <a-entity> with a controller to the scene.');
       }
@@ -101,7 +114,9 @@
           this.hand.addEventListener('loaded', this.setupHand.bind(this));
           return;
         }
-        this.hand.addEventListener('triggerdown', this.click.bind(this));
+        if (!eventListenersAdded) {
+          this.hand.addEventListener('triggerdown', this.click.bind(this));
+        }
         var raycaster = this.hand.components['raycaster'];
         var params = {};
         if (!raycaster){
@@ -151,7 +166,7 @@
 
     click: function(ev){
       if (!this.keyHover){ return; }
-      
+
       switch(this.keyHover.key){
         case 'Enter':
           this.accept();
@@ -276,6 +291,11 @@
       var h2 = h / 2;
       this.inputRect = {x: 0, y: 0, w: w, h: h};
 
+      if (kbdata === undefined){
+        console.error('Simple-Keyboard ERROR: model "' + this.data.model +'" undefined.');
+        return;
+      }
+
       if (!oldData || this.defaultValue != oldData.defaultValue){
         this.rawValue = this.data.value;
         this.defaultValue = this.data.value;
@@ -285,7 +305,12 @@
       }
 
       this.kbImg.setAttribute('geometry', {primitive: 'plane', width: w, height: h});
-      this.kbImg.setAttribute('material', {shader: 'flat', src: kbdata.img, color: this.data.keyColor, transparent: true});
+      this.kbImg.setAttribute('material', {
+        shader: 'flat', 
+        src: this.data.imagePath + '/' + kbdata.img, 
+        color: this.data.keyColor, 
+        transparent: true
+      });
 
       this.label.setAttribute('text', {value: this.data.label, color: this.data.labelColor, width: this.data.width});
       this.label.setAttribute('position', {x: 0, y: 0.3 * w, z: -0.02});
@@ -318,7 +343,14 @@
       var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
       if (this.data.align === 'right') inputx *= -1;
 
-      this.textInput.setAttribute('text', {font: this.data.font, color: this.data.inputColor, width: w, wrapCount: kbdata.wrapCount, align: this.data.align});
+      this.textInput.setAttribute('text', {
+        font: this.data.font, 
+        color: this.data.inputColor, 
+        width: w, 
+        wrapCount: kbdata.wrapCount, 
+        align: this.data.align
+      });
+
       this.textInput.setAttribute('position', {
         x: inputx,
         y: (w / 4) - (this.inputRect.y + this.inputRect.h / 2) * w / 2 + kbdata.inputOffsetY * w, 
