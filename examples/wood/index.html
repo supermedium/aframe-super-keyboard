@@ -5,24 +5,30 @@
     <title>A-Frame Simple Keyboard for A-Frame Component - Basic</title>
     <meta name="description" content="Basic example for Simple Keyboard for A-Frame component."></meta>
     <script src="https://rawgit.com/aframevr/aframe/c4aa63e/dist/aframe-master.min.js"></script>
-    <script src="simple-keyboard-wood.js"></script>
+    <script src="../../dist/aframe-simple-keyboard-component.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
+    <script>
+      AFRAME.registerComponent('wood-keyboard', {
+        dependencies: ['simple-keyboard'],
+        init: function(){
+          var model = { wrapCount: 35, inputOffsetY: 0.003, inputOffsetX: 0, img: "wood.png", layout: [{"key":"Insert", "x":0.023, "y":0.038, "w":0.956, "h":0.126}, {"key":" :-) ", "x":0.027, "y":0.214, "w":0.083, "h":0.148}, {"key":" :-O ", "x":0.124, "y":0.214, "w":0.083, "h":0.148}, {"key":" X-D ", "x":0.23, "y":0.214, "w":0.107, "h":0.148}, {"key":" ¯\\_('_')_/¯ ", "x":0.344, "y":0.214, "w":0.207, "h":0.148}, {"key":" ^_^ ", "x":0.563, "y":0.214, "w":0.114, "h":0.148}, {"key":"!", "x":0.686, "y":0.207, "w":0.079, "h":0.152}, {"key":"?", "x":0.766, "y":0.207, "w":0.079, "h":0.152}, {"key":"Delete", "x":0.865, "y":0.239, "w":0.108, "h":0.146}, {"key":"Enter", "x":0.866, "y":0.479, "w":0.108, "h":0.244}, {"key":"Escape", "x":0.883, "y":0.828, "w":0.078, "h":0.134}, {"key":"Shift", "x":0.021, "y":0.833, "w":0.068, "h":0.142}, {"key":" ", "x":0.266, "y":0.85, "w":0.415, "h":0.126}, {"key":"q", "x":0.049, "y":0.389, "w":0.079, "h":0.152}, {"key":"w", "x":0.128, "y":0.389, "w":0.079, "h":0.152}, {"key":"e", "x":0.208, "y":0.389, "w":0.079, "h":0.152}, {"key":"r", "x":0.287, "y":0.389, "w":0.08, "h":0.152}, {"key":"t", "x":0.368, "y":0.389, "w":0.079, "h":0.152}, {"key":"y", "x":0.447, "y":0.389, "w":0.079, "h":0.152}, {"key":"u", "x":0.526, "y":0.389, "w":0.079, "h":0.152}, {"key":"i", "x":0.606, "y":0.389, "w":0.08, "h":0.152}, {"key":"o", "x":0.686, "y":0.389, "w":0.079, "h":0.152}, {"key":"p", "x":0.766, "y":0.389, "w":0.079, "h":0.152}, {"key":"a", "x":0.097, "y":0.541, "w":0.08, "h":0.154}, {"key":"s", "x":0.176, "y":0.541, "w":0.08, "h":0.154}, {"key":"d", "x":0.256, "y":0.541, "w":0.08, "h":0.154}, {"key":"f", "x":0.336, "y":0.541, "w":0.079, "h":0.154}, {"key":"g", "x":0.415, "y":0.541, "w":0.08, "h":0.154}, {"key":"h", "x":0.495, "y":0.541, "w":0.079, "h":0.154}, {"key":"j", "x":0.575, "y":0.541, "w":0.079, "h":0.154}, {"key":"k", "x":0.654, "y":0.541, "w":0.08, "h":0.154}, {"key":"l", "x":0.734, "y":0.541, "w":0.08, "h":0.154}, {"key":"z", "x":0.177, "y":0.696, "w":0.079, "h":0.154}, {"key":"x", "x":0.256, "y":0.696, "w":0.08, "h":0.154}, {"key":"c", "x":0.336, "y":0.696, "w":0.079, "h":0.154}, {"key":"v", "x":0.415, "y":0.696, "w":0.08, "h":0.154}, {"key":"b", "x":0.495, "y":0.696, "w":0.08, "h":0.154}, {"key":"n", "x":0.575, "y":0.696, "w":0.079, "h":0.154}, {"key":"m", "x":0.654, "y":0.696, "w":0.08, "h":0.154}]};
+
+          this.el.components['simple-keyboard'].addCustomModel('wood', model);
+          this.el.setAttribute('simple-keyboard', {imagePath: '.', model: 'wood'});
+        }
+      });
+    </script>
   </head>
   <body>
     <a-scene environment="preset: forest; skyColor: #0c3d35; horizonColor: #a59c32; lighting: point; groundTexture: walkernoise; groundColor: #a88137; groundColor2: #966a30; dressingOnPlayArea: 0.05">
 
-      <a-entity
-        vive-controls="hand: right" 
-        daydream-controls="hand: right" 
-        oculus-touch-controls="hand: right"
-        windows-motion-controls="hand: right"
-      >
-        <a-sphere radius="0.03"></a-sphere>
-      </a-entity>
+      <a-entity id="righthand" hand-controls="right"></a-entity>
+      <a-entity id="lefthand" hand-controls="left"></a-entity>
 
       <a-entity 
         id="keyboard" 
-        simple-keyboard="model: wood; keyColor: #fff; inputColor: #97f079; label: Hi human!\nSay something to this stranger:; labelColor: #c9b08b; keyPressColor: #fff; keyHoverColor: #3a3521; font: roboto; blinkingSpeed: 100; align: center" 
+        simple-keyboard="imagePath:../../dist/; keyColor: #fff; inputColor: #97f079; label: Hi human!\nSay something to this stranger:; labelColor: #c9b08b; keyPressColor: #fff; keyHoverColor: #3a3521; font: roboto; blinkingSpeed: 100; align: center;" 
+        wood-keyboard
         position="0 1.276 -0.5" 
         rotation="-20 0 0"></a-entity>
     </a-scene>
