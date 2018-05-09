@@ -3,11 +3,11 @@
 [![Version](http://img.shields.io/npm/v/aframe-simple-keyboard-component.svg?style=flat-square)](https://npmjs.org/package/aframe-simple-keyboard-component)
 [![License](http://img.shields.io/npm/l/aframe-simple-keyboard-component.svg?style=flat-square)](https://npmjs.org/package/aframe-simple-keyboard-component)
 
-Lightweight and functional keyboard for VR
+Lightweight, functional and fully customizable keyboard for VR
 
 For [A-Frame](https://aframe.io) 0.8.1 and newer.
 
-![example image](https://raw.githubusercontent.com/feiss/aframe-simple-keyboard-component/master/examples/basic/thumb.jpg)
+![example image](https://raw.githubusercontent.com/feiss/aframe-simple-keyboard-component/master/examples/cover.gif)
 
 ### API
 
@@ -65,7 +65,7 @@ AFRAME.registerComponent('password-filter', {
 
 <a-entity simple-keyboard="filters: custom" password-filter></a-entity>
 ```
-([play example](examples/customfilter))
+([play example](https://feiss.github.io/aframe-simple-keyboard-component/examples/customfilter/))
 
 
 ### Defining custom keyboards and layouts
@@ -76,9 +76,11 @@ AFRAME.registerComponent('password-filter', {
 
 First, you create the image of the keyboard, with the characters and control keys such as `Enter, Dismiss, Backspace, Shift and Space`.
 
-Then you have to tell `simple-keyboard` where the keys are, what is their size, and what character (or command) they produce. For doing this you can use [this editor](editor) providing an image of the keyboard but with flat colored rectangles where the keys are supposed to be (they must not overlap). Then, just by clicking and pressing the corresponding key, you will get the code necessary for copy/pasteing in the `layout` property of the Layout Object, which has the following fields:
+Then you have to tell `simple-keyboard` where the keys are, what is their size, and what character (or command) they produce. For doing this you can use [this editor](editor) providing an image of the keyboard but with flat colored rectangles where the keys are supposed to be (they must not overlap). Then, just by clicking and pressing the corresponding key, you will get the code necessary for defining the layout of the keyboard.
 
-#### Layout object properties
+Finally, you call the component method `addCustomModel(name, layout_definition)` and set the `model` property to your keyboard's name.
+
+`layout_definition` is an object with the following properties:
 
 | Name | Description | Example value |
 | ---- | ----------- | ------------- |
@@ -86,9 +88,9 @@ Then you have to tell `simple-keyboard` where the keys are, what is their size, 
 | inputOffsetX | x distance increment of the input box text, to fine tune | 0.01 |
 | inputOffsetY | same as previous, but y increment | 0.01 |
 | img | keyboard image path | "my-keyboard.png" |
-| layout | array with key slices data |  |
+| layout | array with key slices data (the code generated in the editor) |  |
 
-
+[See an example code of a custom keyboard](examples/wood) ([play example](https://feiss.github.io/aframe-simple-keyboard-component/examples/wood/))
 
 
 ### Installation
