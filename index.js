@@ -88,12 +88,11 @@ AFRAME.registerComponent('simple-keyboard', {
     document.addEventListener('show', this.open.bind(this));
 
     this.hand = null; 
+    this.handListenersSet = false;
     this.raycaster = null;
   },
 
   setupHand: function(){
-    var eventListenersAdded = this.hand !== null;
-
     if (this.data.hand) {
       this.hand = this.data.hand;
     }
@@ -108,8 +107,9 @@ AFRAME.registerComponent('simple-keyboard', {
         this.hand.addEventListener('loaded', this.setupHand.bind(this));
         return;
       }
-      if (!eventListenersAdded) {
+      if (!this.handListenersSet) {
         this.hand.addEventListener('triggerdown', this.click.bind(this));
+        this.handListenersSet = true;
       }
       var raycaster = this.hand.components['raycaster'];
       var params = {};
@@ -185,7 +185,8 @@ AFRAME.registerComponent('simple-keyboard', {
         this.textInput.setAttribute('text', {value: this.data.value});
       break;
     }
-    this.keyHover.el.setAttribute('material', {color: this.data.keyPressColor});
+    
+    this.keyHover.el.material.color.set(this.keyPressColor);
     this.updateCursorPosition();
   },
 
@@ -216,7 +217,9 @@ AFRAME.registerComponent('simple-keyboard', {
 
   blur: function(ev) {
     this.focused = false;
-    if (this.keyHover && this.keyHover.key != 'Shift') this.keyHover.el.setAttribute('material', {color: this.data.keyBgColor});
+    if (this.keyHover && this.keyHover.key != 'Shift') {
+      this.keyHover.el.material.color.set(this.keyBgColor);
+    }
     this.keyHover = null;
   },
 
@@ -333,6 +336,8 @@ AFRAME.registerComponent('simple-keyboard', {
       kdata.el = key;
       key.addEventListener('loaded', function(ev){
         ev.target.object3D.children[0].material.blending = THREE.AdditiveBlending;
+        // cache material for tick()
+        ev.target.material = ev.target.object3D.children[0].material;
       })
       this.keys.appendChild(key);
     }
@@ -358,6 +363,11 @@ AFRAME.registerComponent('simple-keyboard', {
     this.updateCursorPosition();
 
     this.setupHand();
+
+    // cache colors for tick()
+    this.keyBgColor = new THREE.Color(this.data.keyBgColor);
+    this.keyHoverColor = new THREE.Color(this.data.keyHoverColor);
+    this.keyPressColor = new THREE.Color(this.data.keyPressColor);
 
     if (this.data.show) this.open(); else this.close();
   },
@@ -386,7 +396,10 @@ AFRAME.registerComponent('simple-keyboard', {
 
   tick: function (time) {
     if (this.prevCheckTime && (time - this.prevCheckTime < this.data.interval)) { return; }
-    this.prevCheckTime = time;
+    if (!this.prevCheckTime){
+      this.prevCheckTime = time;
+      return;
+    }
     if (!this.raycaster) return;
     if (this.focused){
       var uv = this.raycaster.getIntersection(this.kbImg).uv;
@@ -395,8 +408,10 @@ AFRAME.registerComponent('simple-keyboard', {
         var k = keys[i];
         if (!k.el) continue;
         if (uv.x > k.x && uv.x < k.x + k.w && (1.0 - uv.y) > k.y && (1.0 - uv.y) < k.y + k.h) {
-          if (this.keyHover && (this.keyHover.key != 'Shift' || !this.shift)) this.keyHover.el.setAttribute('material', {color: this.data.keyBgColor});
-          k.el.setAttribute('material', {color: this.data.keyHoverColor});
+          if (this.keyHover && (this.keyHover.key != 'Shift' || !this.shift)) {
+            this.keyHover.el.material.color.set(this.keyBgColor);
+          }
+          k.el.material.color.set(this.keyHoverColor);
           this.keyHover = k;
           break;
         }
