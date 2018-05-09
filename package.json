@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/feiss/aframe-simple-keyboard.git"
+    "url": "git+https://github.com/supermedium/aframe-simple-keyboard.git"
   },
   "keywords": [
     "aframe",
@@ -32,9 +32,9 @@
   "author": "Diego F. Goberna <diego@feiss.be>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/feiss/aframe-simple-keyboard/issues"
+    "url": "https://github.com/supermedium/aframe-simple-keyboard/issues"
   },
-  "homepage": "https://github.com/feiss/aframe-simple-keyboard#readme",
+  "homepage": "https://github.com/supermedium/aframe-simple-keyboard#readme",
   "devDependencies": {
     "aframe": "*",
     "browserify": "^13.0.0",

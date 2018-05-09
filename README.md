@@ -101,9 +101,7 @@ Install and use by directly including the [browser files](dist):
 
 ```html
 <head>
-  <title>My A-Frame Scene</title>
-  <script src="aframe.min.js"></script>
-  <script src="aframe-simple-keyboard-component.min.js"></script>
+  <script src="https://raw.githubusercontent.com/supermedium/aframe-simple-keyboard-component/master/dist/aframe-simple-keyboard-component.min.js"></script>
 </head>
 
 <body>
