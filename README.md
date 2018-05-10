@@ -7,7 +7,7 @@ Lightweight, functional and fully customizable keyboard for VR
 
 For [A-Frame](https://aframe.io) 0.8.1 and newer.
 
-![example image](https://raw.githubusercontent.com/feiss/aframe-simple-keyboard-component/master/examples/cover.gif)
+![example image](https://raw.githubusercontent.com/supermedium/aframe-simple-keyboard-component/master/examples/cover.gif)
 
 ### API
 
@@ -65,7 +65,7 @@ AFRAME.registerComponent('password-filter', {
 
 <a-entity simple-keyboard="filters: custom" password-filter></a-entity>
 ```
-([play example](https://feiss.github.io/aframe-simple-keyboard-component/examples/customfilter/))
+([play example](https://supermedium.github.io/aframe-simple-keyboard-component/examples/customfilter/))
 
 
 ### Defining custom keyboards and layouts
@@ -90,7 +90,7 @@ Finally, you call the component method `addCustomModel(name, layout_definition)`
 | img | keyboard image path | "my-keyboard.png" |
 | layout | array with key slices data (the code generated in the editor) |  |
 
-[See an example code of a custom keyboard](examples/wood) ([play example](https://feiss.github.io/aframe-simple-keyboard-component/examples/wood/))
+[See an example code of a custom keyboard](examples/wood) ([play example](https://supermedium.github.io/aframe-simple-keyboard-component/examples/wood/))
 
 
 ### Installation
