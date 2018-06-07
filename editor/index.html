@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>A-Frame Simple-Keyboard Layout Editor</title>
+  <title>A-Frame Super Keyboard Layout Editor</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono:600" rel="stylesheet">
 <style>
@@ -60,7 +60,7 @@
 </style>
 </head>
 <body>
-<h1>AFrame-Simple-Keyboard-Component Layout Editor</h1>
+<h1>A-Frame Super Keyboard Layout Editor</h1>
 <p>Drag in or select a keyboard image <br>
   <input type="file" onchange="loadImage(this.files.item(0))">
 </p>
@@ -73,14 +73,14 @@
 <ul>
   <li>Click on the image to create a slice, and press a key to assign the value it produces.</li>
   <li>Remember to add a slice with <code>Insert</code> key for the input box</li>
-  <li>When finished, copy&amp;paste the code in simple-keyboard <code>this.KEYBOARDS.layout</code>.</li>
-  
+  <li>When finished, copy&amp;paste the code in super-keyboard <code>this.KEYBOARDS.layout</code>.</li>
+
 </ul>
 <h3>Special keys</h3>
 <dl>
   <dt>Ctrl+Del</dt>
   <dd>Delete selected slice</dd>
-  <dt>slice + Enter</dt> 
+  <dt>slice + Enter</dt>
   <dd>Key slice for accepting the text entered and close the keyboard.</dd>
   <dt>slice + Del</dt>
   <dd>Key slice for backspace (delete last character introduced)</dd>
@@ -91,13 +91,13 @@
 </dl>
 
 <p>
-  See <a href="http://supermedium.github.io/aframe-simple-keyboard-component">examples</a>, contribute and send issues to the <a href="http://github.com/supermedium/aframe-simple-keyboard-component">GitHub repo</a>
+  See <a href="http://supermedium.github.io/aframe-super-keyboard">examples</a>, contribute and send issues to the <a href="http://github.com/supermedium/aframe-super-keyboard">GitHub repo</a>
 </p>
 
 <footer><a href="https://supermedium.com">Supermedium.com</a></footer>
 
 <script>
-  
+
 var can = document.getElementById('c');
 var c = can.getContext('2d');
 var im;
@@ -107,7 +107,7 @@ var img = new Image();
 
 img.onload = function(ev){
   if (img.width != img.height * 2) {
-    alert("WARNING: simple-keyboard expects images with double width than height (eg. 2048 x 1024)");
+    alert("WARNING: super-keyboard expects images with double width than height (eg. 2048 x 1024)");
   }
   can.width = img.width;
   can.height = img.height;
@@ -127,7 +127,7 @@ window.addEventListener('resize', updateZoom);
 function updateZoom(){
   if (!img) return;
   var w;
-  if(can.offsetWidth) { w = can.offsetWidth; } 
+  if(can.offsetWidth) { w = can.offsetWidth; }
   else if(can.style.pixelWidth) { w = can.style.pixelWidth; }
 
   zoom = w / img.width;
@@ -174,7 +174,7 @@ function getRect(x, y){
 can.addEventListener('mousedown', function(ev){
   var x = parseInt(ev.offsetX / zoom);
   var y = parseInt(ev.offsetY / zoom);
-  var s = getSliceOn(x, y); 
+  var s = getSliceOn(x, y);
   if (s){
     selected = s;
     redraw();

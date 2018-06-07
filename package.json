@@ -1,16 +1,16 @@
 {
-  "name": "aframe-simple-keyboard-component",
+  "name": "aframe-super-keyboard",
   "version": "1.0.0",
-  "description": "Lightweight and functional keyboard for VR",
+  "description": "Lightweight, functional, and fully customizable VR keyboard for A-Frame.",
   "main": "index.js",
-  "unpkg": "dist/aframe-simple-keyboard-component.min.js",
+  "unpkg": "dist/aframe-super-keyboard.min.js",
   "scripts": {
-    "dev": "budo index.js:dist/aframe-simple-keyboard-component.min.js --port 7000 --live --open",
-    "dist": "npm run rollup && uglifyjs dist/aframe-simple-keyboard-component.js > dist/aframe-simple-keyboard-component.min.js",
+    "build": "webpack index.js dist/aframe-super-keyboard.js",
+    "dev": "budo index.js:dist/aframe-super-keyboard.min.js --port 7000 --live --open",
+    "dist": "npm run build && uglifyjs dist/aframe-super-keyboard.js > dist/aframe-super-keyboard.min.js",
     "lint": "semistandard -v | snazzy",
     "prepublish": "npm run dist",
     "ghpages": "ghpages",
-    "rollup": "rollup index.js --output.format umd --name 'aframe-simple-keyboard-component' --output.file dist/aframe-simple-keyboard-component.js",
     "start": "npm run dev",
     "test": "karma start ./tests/karma.conf.js",
     "test:firefox": "karma start ./tests/karma.conf.js --browsers Firefox",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/supermedium/aframe-simple-keyboard.git"
+    "url": "git+https://github.com/supermedium/aframe-super-keyboard.git"
   },
   "keywords": [
     "aframe",
@@ -27,14 +27,14 @@
     "vr",
     "mozvr",
     "webvr",
-    "simple-keyboard"
+    "super-keyboard"
   ],
   "author": "Diego F. Goberna <diego@feiss.be>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/supermedium/aframe-simple-keyboard/issues"
+    "url": "https://github.com/supermedium/aframe-super-keyboard/issues"
   },
-  "homepage": "https://github.com/supermedium/aframe-simple-keyboard#readme",
+  "homepage": "https://github.com/supermedium/aframe-super-keyboard#readme",
   "devDependencies": {
     "aframe": "*",
     "browserify": "^13.0.0",
@@ -59,7 +59,8 @@
     "sinon-chai": "^2.8.0",
     "shx": "^0.1.1",
     "snazzy": "^4.0.0",
-    "uglify-es": "github:mishoo/UglifyJS2#harmony"
+    "uglify-es": "github:mishoo/UglifyJS2#harmony",
+    "webpack": "3.8.1"
   },
   "semistandard": {
     "globals": [
@@ -72,7 +73,6 @@
     ]
   },
   "dependencies": {
-    "rollup": "^0.58.2",
     "uglify-js": "^3.3.23",
     "uglifyjs": "^2.4.11"
   }

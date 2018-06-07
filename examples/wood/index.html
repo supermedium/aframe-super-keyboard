@@ -2,19 +2,19 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>A-Frame Simple Keyboard for A-Frame Component - Basic</title>
-    <meta name="description" content="Basic example for Simple Keyboard for A-Frame component."></meta>
+    <title>A-Frame Super Keyboard - Custom</title>
+    <meta name="description" content="Custom keyboard."></meta>
     <script src="https://rawgit.com/aframevr/aframe/c4aa63e/dist/aframe-master.min.js"></script>
-    <script src="../../dist/aframe-simple-keyboard-component.min.js"></script>
+    <script src="../../dist/aframe-super-keyboard.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
     <script>
       AFRAME.registerComponent('wood-keyboard', {
-        dependencies: ['simple-keyboard'],
+        dependencies: ['super-keyboard'],
         init: function(){
           var model = { wrapCount: 35, inputOffsetY: 0.003, inputOffsetX: 0, img: "wood.png", layout: [{"key":"Insert", "x":0.023, "y":0.038, "w":0.956, "h":0.126}, {"key":" :-) ", "x":0.027, "y":0.214, "w":0.083, "h":0.148}, {"key":" :-O ", "x":0.124, "y":0.214, "w":0.083, "h":0.148}, {"key":" X-D ", "x":0.23, "y":0.214, "w":0.107, "h":0.148}, {"key":" ¯\\_('_')_/¯ ", "x":0.344, "y":0.214, "w":0.207, "h":0.148}, {"key":" ^_^ ", "x":0.563, "y":0.214, "w":0.114, "h":0.148}, {"key":"!", "x":0.686, "y":0.207, "w":0.079, "h":0.152}, {"key":"?", "x":0.766, "y":0.207, "w":0.079, "h":0.152}, {"key":"Delete", "x":0.865, "y":0.239, "w":0.108, "h":0.146}, {"key":"Enter", "x":0.866, "y":0.479, "w":0.108, "h":0.244}, {"key":"Escape", "x":0.883, "y":0.828, "w":0.078, "h":0.134}, {"key":"Shift", "x":0.021, "y":0.833, "w":0.068, "h":0.142}, {"key":" ", "x":0.266, "y":0.85, "w":0.415, "h":0.126}, {"key":"q", "x":0.049, "y":0.389, "w":0.079, "h":0.152}, {"key":"w", "x":0.128, "y":0.389, "w":0.079, "h":0.152}, {"key":"e", "x":0.208, "y":0.389, "w":0.079, "h":0.152}, {"key":"r", "x":0.287, "y":0.389, "w":0.08, "h":0.152}, {"key":"t", "x":0.368, "y":0.389, "w":0.079, "h":0.152}, {"key":"y", "x":0.447, "y":0.389, "w":0.079, "h":0.152}, {"key":"u", "x":0.526, "y":0.389, "w":0.079, "h":0.152}, {"key":"i", "x":0.606, "y":0.389, "w":0.08, "h":0.152}, {"key":"o", "x":0.686, "y":0.389, "w":0.079, "h":0.152}, {"key":"p", "x":0.766, "y":0.389, "w":0.079, "h":0.152}, {"key":"a", "x":0.097, "y":0.541, "w":0.08, "h":0.154}, {"key":"s", "x":0.176, "y":0.541, "w":0.08, "h":0.154}, {"key":"d", "x":0.256, "y":0.541, "w":0.08, "h":0.154}, {"key":"f", "x":0.336, "y":0.541, "w":0.079, "h":0.154}, {"key":"g", "x":0.415, "y":0.541, "w":0.08, "h":0.154}, {"key":"h", "x":0.495, "y":0.541, "w":0.079, "h":0.154}, {"key":"j", "x":0.575, "y":0.541, "w":0.079, "h":0.154}, {"key":"k", "x":0.654, "y":0.541, "w":0.08, "h":0.154}, {"key":"l", "x":0.734, "y":0.541, "w":0.08, "h":0.154}, {"key":"z", "x":0.177, "y":0.696, "w":0.079, "h":0.154}, {"key":"x", "x":0.256, "y":0.696, "w":0.08, "h":0.154}, {"key":"c", "x":0.336, "y":0.696, "w":0.079, "h":0.154}, {"key":"v", "x":0.415, "y":0.696, "w":0.08, "h":0.154}, {"key":"b", "x":0.495, "y":0.696, "w":0.08, "h":0.154}, {"key":"n", "x":0.575, "y":0.696, "w":0.079, "h":0.154}, {"key":"m", "x":0.654, "y":0.696, "w":0.08, "h":0.154}]};
 
-          this.el.components['simple-keyboard'].addCustomModel('wood', model);
-          this.el.setAttribute('simple-keyboard', {imagePath: '.', model: 'wood'});
+          this.el.components['super-keyboard'].addCustomModel('wood', model);
+          this.el.setAttribute('super-keyboard', {imagePath: '.', model: 'wood'});
         }
       });
     </script>
@@ -25,17 +25,19 @@
       <a-entity id="righthand" hand-controls="right"></a-entity>
       <a-entity id="lefthand" hand-controls="left"></a-entity>
 
-      <a-entity 
-        id="keyboard" 
-        simple-keyboard="imagePath:../../dist/; keyColor: #fff; inputColor: #97f079; label: Hi human!\nSay something to this stranger:; labelColor: #c9b08b; keyPressColor: #fff; keyHoverColor: #3a3521; font: roboto; blinkingSpeed: 100; align: center;" 
+      <a-entity cursor="rayOrigin: mouse"></a-entity>
+
+      <a-entity
+        id="keyboard"
+        super-keyboard="imagePath:../../dist/; keyColor: #fff; inputColor: #97f079; label: Hi human!\nSay something to this stranger:; labelColor: #c9b08b; keyPressColor: #fff; keyHoverColor: #3a3521; font: roboto; blinkingSpeed: 100; align: center;"
         wood-keyboard
-        position="0 1.276 -0.5" 
+        position="0 1.276 -0.5"
         rotation="-20 0 0"></a-entity>
     </a-scene>
 
 
     <!-- GitHub Corner. -->
-    <a href="https://github.com/supermedium/aframe-simple-keyboard-component" class="github-corner">
+    <a href="https://github.com/supermedium/aframe-super-keyboard" class="github-corner">
       <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#222; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
         <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
       </svg>
