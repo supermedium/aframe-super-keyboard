@@ -397,6 +397,9 @@ AFRAME.registerComponent('super-keyboard', {
         this.accept();
         break;
       }
+      case 'Insert': {
+        return;
+      }
       case 'Delete': {
         this.rawValue = this.rawValue.substr(0, this.rawValue.length - 1);
         var newValue = this.filter(this.rawValue);
