@@ -97,16 +97,18 @@ Finally, you call the component method `addCustomModel(name, layout_definition)`
 
 #### Browser
 
-Install and use by directly including the [browser files](dist):
+Install and use by directly including the [browser files](dist).
+
+Also grab the keyboard assets (e.g., in the `dist/`) and drop into your
+project, specifying the `imagePath`.
 
 ```html
 <head>
-  <script src="https://raw.githubusercontent.com/supermedium/aframe-super-keyboard/master/dist/aframe-super-keyboard.min.js"></script>
+  <script src="https://unpkg.com/aframe-super-keyboard@1.0.0/dist/aframe-super-keyboard.min.js"></script>
 </head>
-
 <body>
   <a-scene>
-    <a-entity super-keyboard></a-entity>
+    <a-entity super-keyboard="imagePath: assets/img/keyboard"></a-entity>
   </a-scene>
 </body>
 ```

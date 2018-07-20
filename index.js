@@ -1,4 +1,6 @@
 /* global AFRAME */
+var KEYBOARDS = require('./keyboards');
+
 if (typeof AFRAME === 'undefined') {
   throw new Error('Component attempted to register before AFRAME was available.');
 }
@@ -24,6 +26,7 @@ AFRAME.registerComponent('super-keyboard', {
     font: {default: 'aileronsemibold'},
     hand: {type: 'selector'},
     imagePath: {default: '.'},
+    injectIntoRaycasterObjects: {default: true},
     inputColor: {type: 'color', default: '#6699ff'},
     interval: {type: 'int', default: 50},
     keyBgColor: {type: 'color', default: '#000'},
@@ -42,7 +45,7 @@ AFRAME.registerComponent('super-keyboard', {
   init: function () {
     this.el.addEventListener('click', this.click.bind(this));
 
-    this.KEYBOARDS = require('./keyboards');
+    this.KEYBOARDS = KEYBOARDS;
 
     this.keys = null;
     this.focused = false;
@@ -57,10 +60,11 @@ AFRAME.registerComponent('super-keyboard', {
     this.intervalId = 0;
 
     this.kbImg = document.createElement('a-entity');
-    this.el.appendChild(this.kbImg);
-    this.kbImg.classList.add('keyboard-raycastable');
+    this.kbImg.classList.add('keyboardRaycastable');
+    this.kbImg.classList.add('superKeyboardImage');
     this.kbImg.addEventListener('raycaster-intersected', this.hover.bind(this));
     this.kbImg.addEventListener('raycaster-intersected-cleared', this.blur.bind(this));
+    this.el.appendChild(this.kbImg);
 
     this.label = document.createElement('a-entity');
     this.label.setAttribute('text', {align: 'center', font: this.data.font, baseline: 'bottom', lineHeight: 40, value: this.data.label, color: this.data.labelColor, width: this.data.width, wrapCount: 30});
@@ -238,17 +242,24 @@ AFRAME.registerComponent('super-keyboard', {
       }
       var raycaster = this.hand.components['raycaster'];
       var params = {};
+
       if (!raycaster) {
         this.hand.ownRaycaster = true;
-        params['showLine'] = true;
-        params['objects'] = '.keyboard-raycastable';
+        params.showLine = true;
+        if (this.data.injectToRaycasterObjects) {
+          params.objects = '.keyboardRaycastable';
+        }
+        this.hand.setAttribute('raycaster', params);
       } else {
         this.hand.ownRaycaster = false;
-        var objs = raycaster.data.objects.split(',');
-        if (objs.indexOf('.keyboard-raycastable') === -1) { objs.push('.keyboard-raycastable'); }
-        params['objects'] = objs.join(',').replace(/^,/, '');
+        if (this.data.injectToRaycasterObjects) {
+          var objs = raycaster.data.objects.split(',');
+          if (objs.indexOf('.keyboardRaycastable') === -1) { objs.push('.keyboardRaycastable'); }
+          params.objects = objs.join(',').replace(/^,/, '');
+          this.hand.setAttribute('raycaster', params);
+        }
       }
-      this.hand.setAttribute('raycaster', params);
+
       this.raycaster = this.hand.components.raycaster;
     }
   },
