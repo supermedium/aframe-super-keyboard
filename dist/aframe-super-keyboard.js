@@ -166,7 +166,7 @@ AFRAME.registerComponent('super-keyboard', {
       this.hand = this.data.hand;
     }
     else {
-      this.hand = document.querySelector('[vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] > [raycaster]');
+      this.hand = document.querySelector('[vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] [cursor] > [raycaster]');
     }
     if (!this.hand){
       console.error('super-keyboard: no controller found. Add an <a-entity> with a controller to the scene.');
@@ -178,6 +178,7 @@ AFRAME.registerComponent('super-keyboard', {
       }
       if (!this.handListenersSet) {
         this.hand.addEventListener('triggerdown', this.click.bind(this));
+        this.hand.addEventListener('click', this.click.bind(this));
         this.handListenersSet = true;
       }
       var raycaster = this.hand.components['raycaster'];
@@ -471,6 +472,7 @@ AFRAME.registerComponent('super-keyboard', {
     }
     if (!this.raycaster) return;
     if (this.focused){
+      if (!this.raycaster.getIntersection(this.kbImg)) { return; }
       var uv = this.raycaster.getIntersection(this.kbImg).uv;
       var keys = this.KEYBOARDS[this.data.model].layout;
       for (var i = 0; i < keys.length; i++) {
