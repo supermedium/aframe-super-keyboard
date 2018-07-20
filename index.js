@@ -71,7 +71,7 @@ AFRAME.registerComponent('super-keyboard', {
     this.el.appendChild(this.textInput);
 
     this.cursor = document.createElement('a-entity');
-    this.cursor.setAttribute('position', {x: 0, y: 0, z: 0.001});
+    this.cursor.object3D.position.set(0, 0, 0.001);
     this.cursor.setAttribute('material', {shader: 'flat', color: this.data.inputColor});
     this.textInput.appendChild(this.cursor);
     this.cursorUpdated = false;
@@ -154,7 +154,7 @@ AFRAME.registerComponent('super-keyboard', {
       this.keys.appendChild(key);
     }
 
-    var inputx = this.data.align = 'center' ? kbdata.inputOffsetX * w : 0;
+    var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
     if (this.data.align === 'right') inputx *= -1;
 
     this.textInput.setAttribute('text', {
