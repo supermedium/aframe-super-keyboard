@@ -26,7 +26,7 @@ AFRAME.registerComponent('super-keyboard', {
     font: {default: 'aileronsemibold'},
     hand: {type: 'selector'},
     imagePath: {default: '.'},
-    injectIntoRaycasterObjects: {default: true},
+    injectToRaycasterObjects: {default: true},
     inputColor: {type: 'color', default: '#6699ff'},
     interval: {type: 'int', default: 50},
     keyBgColor: {type: 'color', default: '#000'},
@@ -44,8 +44,8 @@ AFRAME.registerComponent('super-keyboard', {
 
   init: function () {
     this.el.addEventListener('click', this.click.bind(this));
-
-    this.KEYBOARDS = KEYBOARDS;
+    this.changeEventDetail = {};
+    this.textInputObject = {};
 
     this.keys = null;
     this.focused = false;
@@ -59,6 +59,7 @@ AFRAME.registerComponent('super-keyboard', {
     this.userFilterFunc = null;
     this.intervalId = 0;
 
+    // Create keyboard image.
     this.kbImg = document.createElement('a-entity');
     this.kbImg.classList.add('keyboardRaycastable');
     this.kbImg.classList.add('superKeyboardImage');
@@ -66,12 +67,29 @@ AFRAME.registerComponent('super-keyboard', {
     this.kbImg.addEventListener('raycaster-intersected-cleared', this.blur.bind(this));
     this.el.appendChild(this.kbImg);
 
+    // Create label.
     this.label = document.createElement('a-entity');
-    this.label.setAttribute('text', {align: 'center', font: this.data.font, baseline: 'bottom', lineHeight: 40, value: this.data.label, color: this.data.labelColor, width: this.data.width, wrapCount: 30});
+    this.label.setAttribute('text', {
+      align: 'center',
+      font: this.data.font,
+      baseline: 'bottom',
+      lineHeight: 40,
+      value: this.data.label,
+      color: this.data.labelColor,
+      width: this.data.width,
+      wrapCount: 30});
     this.el.appendChild(this.label);
 
+    // Create input.
     this.textInput = document.createElement('a-entity');
-    this.textInput.setAttribute('text', {align: this.data.align, font: this.data.font, value: this.data.value, color: this.data.inputColor, width: this.data.width, wrapCount: 20});
+    this.textInput.setAttribute('text', {
+      align: this.data.align,
+      font: this.data.font,
+      value: this.data.value,
+      color: this.data.inputColor,
+      width: this.data.width,
+      wrapCount: 20
+    });
     this.el.appendChild(this.textInput);
 
     this.cursor = document.createElement('a-entity');
@@ -96,15 +114,18 @@ AFRAME.registerComponent('super-keyboard', {
     this.hand = null;
     this.handListenersSet = false;
     this.raycaster = null;
+
+    this.keys = document.createElement('a-entity');
+    this.el.appendChild(this.keys);
+    this.keys.object3D.position.set(0, 0, 0.001);
   },
 
   update: function (oldData) {
-    var kbdata = this.KEYBOARDS[this.data.model];
+    var kbdata = KEYBOARDS[this.data.model];
     var w = this.data.width;
     var h = this.data.width / 2;
     var w2 = w / 2;
     var h2 = h / 2;
-    this.inputRect = {x: 0, y: 0, w: w, h: h};
 
     if (kbdata === undefined) {
       console.error('super-keyboard ERROR: model "' + this.data.model + '" undefined.');
@@ -114,9 +135,9 @@ AFRAME.registerComponent('super-keyboard', {
     if (!oldData || this.defaultValue !== oldData.defaultValue) {
       this.rawValue = this.data.value;
       this.defaultValue = this.data.value;
-      this.textInput.setAttribute('text', {value: this.filter(this.data.value)});
+      this.updateTextInput(this.filter(this.data.value));
     } else {
-      this.textInput.setAttribute('text', {value: this.filter(this.rawValue)});
+      this.updateTextInput(this.filter(this.rawValue));
     }
 
     this.kbImg.setAttribute('geometry', {primitive: 'plane', width: w, height: h});
@@ -130,36 +151,13 @@ AFRAME.registerComponent('super-keyboard', {
     this.label.setAttribute('text', {value: this.data.label, color: this.data.labelColor, width: this.data.width});
     this.label.object3D.position.set(0, 0.3 * w, -0.02);
 
-    if (this.keys) {
-      this.keys.parentNode.removeChild(this.keys);
-    }
-
-    this.keys = document.createElement('a-entity');
-    this.el.appendChild(this.keys);
-    this.keys.object3D.position.set(0, 0, 0.001);
-
-    for (var i = 0; i < kbdata.layout.length; i++) {
-      var kdata = kbdata.layout[i];
-      var keyw = kdata.w * w;
-      var keyh = kdata.h * h;
-      if (kdata.key === 'Insert') { this.inputRect = kdata; continue; }
-
-      var key = document.createElement('a-entity');
-      key.setAttribute('data-key', kdata.key);
-      key.object3D.position.set(kdata.x * w - w2 + keyw / 2, (1 - kdata.y) * h - h2 - keyh / 2, 0);
-      key.setAttribute('geometry', {primitive: 'plane', width: keyw, height: keyh});
-      key.setAttribute('material', {shader: 'flat', color: this.data.keyBgColor, transparent: true});
-      kdata.el = key;
-      key.addEventListener('loaded', function (ev) {
-        ev.target.object3D.children[0].material.blending = THREE.AdditiveBlending;
-        // cache material for tick()
-        ev.target.material = ev.target.object3D.children[0].material;
-      });
-      this.keys.appendChild(key);
+    if (!this.keysInit) {
+      this.initKeys();
+      this.keysInit = true;
     }
 
     var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
-    if (this.data.align === 'right') inputx *= -1;
+    if (this.data.align === 'right') { inputx *= -1; }
 
     this.textInput.setAttribute('text', {
       font: this.data.font,
@@ -168,6 +166,13 @@ AFRAME.registerComponent('super-keyboard', {
       wrapCount: kbdata.wrapCount,
       align: this.data.align
     });
+
+    for (var i = 0; i < kbdata.layout.length; i++) {
+      var kdata = kbdata.layout[i];
+      if (kdata.key === 'Insert') {
+        this.inputRect = kdata;
+      }
+    }
 
     this.textInput.object3D.position.set(
       inputx,
@@ -193,6 +198,8 @@ AFRAME.registerComponent('super-keyboard', {
   },
 
   tick: function (time) {
+    var intersection;
+
     if (this.prevCheckTime && (time - this.prevCheckTime < this.data.interval)) { return; }
     if (!this.prevCheckTime) {
       this.prevCheckTime = time;
@@ -200,18 +207,20 @@ AFRAME.registerComponent('super-keyboard', {
     }
     if (!this.raycaster) { return; }
     if (!this.focused) { return; }
-    if (!this.raycaster.getIntersection(this.kbImg)) { return; }
 
-    var uv = this.raycaster.getIntersection(this.kbImg).uv;
-    var keys = this.KEYBOARDS[this.data.model].layout;
+    intersection = this.raycaster.getIntersection(this.kbImg);
+    if (!intersection) { return; }
+
+    var uv = intersection.uv;
+    var keys = KEYBOARDS[this.data.model].layout;
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
       if (!k.el) { continue; }
       if (uv.x > k.x && uv.x < k.x + k.w && (1.0 - uv.y) > k.y && (1.0 - uv.y) < k.y + k.h) {
         if (this.keyHover && (this.keyHover.key !== 'Shift' || !this.shift)) {
-          this.keyHover.el.material.color.set(this.keyBgColor);
+          this.keyHover.el.getObject3D('mesh').material.color.set(this.keyBgColor);
         }
-        k.el.material.color.set(this.keyHoverColor);
+        k.el.getObject3D('mesh').material.color.set(this.keyHoverColor);
         this.keyHover = k;
         break;
       }
@@ -227,12 +236,49 @@ AFRAME.registerComponent('super-keyboard', {
     this.stopBlinking();
   },
 
+  initKeys: function () {
+    var kbdata = KEYBOARDS[this.data.model];
+    var w = this.data.width;
+    var h = this.data.width / 2;
+    var w2 = w / 2;
+    var h2 = h / 2;
+
+    for (var i = 0; i < kbdata.layout.length; i++) {
+      var kdata = kbdata.layout[i];
+      var keyw = kdata.w * w;
+      var keyh = kdata.h * h;
+      if (kdata.key === 'Insert') {
+        continue;
+      }
+
+      var key = document.createElement('a-entity');
+      key.setAttribute('data-key', kdata.key);
+      key.object3D.position.set(kdata.x * w - w2 + keyw / 2, (1 - kdata.y) * h - h2 - keyh / 2, 0);
+      key.setAttribute('geometry', {primitive: 'plane', width: keyw, height: keyh});
+      key.setAttribute('material', {shader: 'flat', color: this.data.keyBgColor, transparent: true});
+      key.addEventListener('componentinitialized', function (evt) {
+        if (evt.detail.name !== 'material') { return; }
+        this.getObject3D('mesh').material.blending = THREE.AdditiveBlending;
+      });
+      kdata.el = key;
+      this.keys.appendChild(key);
+    }
+  },
+
   setupHand: function () {
     if (this.data.hand) {
       this.hand = this.data.hand;
     } else {
-      this.hand = document.querySelector('[vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] [cursor] > [raycaster]');
+      this.hand = document.querySelector([
+        '[vive-controls]',
+        '[tracked-controls]',
+        '[oculus-touch-controls]',
+        '[windows-motion-controls]',
+        '[hand-controls]',
+        '[daydream-controls] [cursor] > [raycaster]'
+      ].join(','));
     }
+
     if (!this.hand) {
       console.error('super-keyboard: no controller found. Add <a-entity> with controller or specify with super-keyboard="hand: #selectorToController".');
     } else {
@@ -254,7 +300,9 @@ AFRAME.registerComponent('super-keyboard', {
         this.hand.ownRaycaster = false;
         if (this.data.injectToRaycasterObjects) {
           var objs = raycaster.data.objects.split(',');
-          if (objs.indexOf('.keyboardRaycastable') === -1) { objs.push('.keyboardRaycastable'); }
+          if (objs.indexOf('.keyboardRaycastable') === -1) {
+            objs.push('.keyboardRaycastable');
+          }
           params.objects = objs.join(',').replace(/^,/, '');
           this.hand.setAttribute('raycaster', params);
         }
@@ -311,13 +359,15 @@ AFRAME.registerComponent('super-keyboard', {
       }
       case 'Delete': {
         this.rawValue = this.rawValue.substr(0, this.rawValue.length - 1);
-        this.data.value = this.filter(this.rawValue);
-        this.textInput.setAttribute('text', {value: this.data.value});
+        this.el.setAttribute('super-keyboard', 'value', this.filter(this.rawValue));
+        this.updateTextInput(this.filter(this.rawValue));
         break;
       }
       case 'Shift': {
         this.shift = !this.shift;
-        this.keyHover.el.setAttribute('material', {color: this.shift ? this.data.keyHoverColor : this.data.keyBgColor});
+        this.keyHover.el.setAttribute('material', 'color',
+          this.shift ? this.data.keyHoverColor : this.data.keyBgColor
+        );
         break;
       }
       case 'Escape': {
@@ -327,19 +377,23 @@ AFRAME.registerComponent('super-keyboard', {
       default: {
         if (this.data.maxLength > 0 && this.rawValue.length > this.data.maxLength) { break; }
         this.rawValue += this.shift ? this.keyHover.key.toUpperCase() : this.keyHover.key;
-        this.data.value = this.filter(this.rawValue);
-        this.textInput.setAttribute('text', {value: this.data.value});
+        this.el.setAttribute('super-keyboard', 'value', this.filter(this.rawValue));
+        this.updateTextInput(this.filter(this.rawValue));
+        this.changeEventDetail.value = this.data.value;
+        this.el.emit('superkeyboardchange', this.changeEventDetail);
         break;
       }
     }
 
-    this.keyHover.el.material.color.set(this.keyPressColor);
+    this.keyHover.el.getObject3D('mesh').material.color.set(this.keyPressColor);
     this.updateCursorPosition();
   },
 
   open: function () {
     this.el.object3D.visible = true;
-    if (this.hand && this.hand.ownRaycaster) this.hand.setAttribute('raycaster', {showLine: true, enabled: true});
+    if (this.hand && this.hand.ownRaycaster) {
+      this.hand.setAttribute('raycaster', {showLine: true, enabled: true});
+    }
   },
 
   close: function () {
@@ -348,24 +402,28 @@ AFRAME.registerComponent('super-keyboard', {
 
   accept: function () {
     this.el.object3D.visible = false;
-    if (this.hand && this.hand.ownRaycaster) this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
-    this.el.emit('keyboard-accepted', {value: this.data.value});
+    if (this.hand && this.hand.ownRaycaster) {
+      this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
+    }
+    this.el.emit('superkeyboardinput', {value: this.data.value});
     this.data.show = false;
   },
 
   dismiss: function () {
     this.data.value = this.defaultValue;
-    this.textInput.setAttribute('text', {value: this.data.value});
+    this.updateTextInput();
     this.el.object3D.visible = false;
-    if (this.hand && this.hand.ownRaycaster) this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
-    this.el.emit('keyboard-dismissed');
+    if (this.hand && this.hand.ownRaycaster) {
+      this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
+    }
+    this.el.emit('superkeyboarddismissed');
     this.data.show = false;
   },
 
   blur: function (ev) {
     this.focused = false;
     if (this.keyHover && this.keyHover.key !== 'Shift') {
-      this.keyHover.el.material.color.set(this.keyBgColor);
+      this.keyHover.el.getObject3D('mesh').material.color.set(this.keyBgColor);
     }
     this.keyHover = null;
   },
@@ -395,7 +453,7 @@ AFRAME.registerComponent('super-keyboard', {
 
   addCustomModel: function (name, model) {
     if (!name) { return; }
-    this.KEYBOARDS[name] = model;
+    KEYBOARDS[name] = model;
   },
 
   updateCursorPosition: function () {
@@ -410,20 +468,13 @@ AFRAME.registerComponent('super-keyboard', {
       return;
     }
 
-    function findFontChar (chars, code) {
-      for (var i = 0; i < chars.length; i++) {
-        if (chars[i].id === code) return chars[i];
-      }
-      return null;
-    }
-
     var w = this.data.width;
-    var kbdata = this.KEYBOARDS[this.data.model];
+    var kbdata = KEYBOARDS[this.data.model];
     var posy = -this.inputRect.h / 2 * w / 2.4 + kbdata.inputOffsetY * w;
     var ratio = this.data.width / this.textInput.components.text.data.wrapCount;
     var pos = 0;
     var fontFactor = FontFactors[this.textInput.components.text.data.font];
-    if (fontFactor === undefined) fontFactor = 20;
+    if (fontFactor === undefined) { fontFactor = 20; }
     for (var i = 0; i < this.data.value.length; i++) {
       var char = findFontChar(font.chars, this.data.value.charCodeAt(i));
       pos += char.width + char.xadvance * (char.id === 32 ? 2 : 1);
@@ -439,5 +490,17 @@ AFRAME.registerComponent('super-keyboard', {
     }
     this.cursor.object3D.position.set(pos, posy, 0.001);
     this.cursorUpdated = true;
+  },
+
+  updateTextInput: function (value) {
+    this.textInputObject.value = value || this.data.value;
+    this.textInput.setAttribute('text', this.textInputObject);
   }
 });
+
+function findFontChar (chars, code) {
+  for (var i = 0; i < chars.length; i++) {
+    if (chars[i].id === code) { return chars[i]; }
+  }
+  return null;
+}
