@@ -98,6 +98,10 @@ AFRAME.registerComponent('super-keyboard', {
     this.textInput.appendChild(this.cursor);
     this.cursorUpdated = false;
 
+    this.keyBgColor = new THREE.Color();
+    this.keyHoverColor = new THREE.Color();
+    this.keyPressColor = new THREE.Color();
+
     var self = this;
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 't') {
@@ -140,33 +144,48 @@ AFRAME.registerComponent('super-keyboard', {
       this.updateTextInput(this.filter(this.rawValue));
     }
 
-    this.kbImg.setAttribute('geometry', {primitive: 'plane', width: w, height: h});
-    this.kbImg.setAttribute('material', {
-      shader: 'flat',
-      src: this.data.imagePath + '/' + kbdata.img,
-      color: this.data.keyColor,
-      transparent: true
-    });
+    if (this.data.width !== oldData.width ||
+        this.data.height !== oldData.height ||
+        this.data.keyColor !== oldData.keyColor) {
+      this.kbImg.setAttribute('geometry', {primitive: 'plane', width: w, height: h});
+      this.kbImg.setAttribute('material', {
+        shader: 'flat',
+        src: this.data.imagePath + '/' + kbdata.img,
+        color: this.data.keyColor,
+        transparent: true
+      });
+    }
 
-    this.label.setAttribute('text', {value: this.data.label, color: this.data.labelColor, width: this.data.width});
-    this.label.object3D.position.set(0, 0.3 * w, -0.02);
+    if (this.data.label !== oldData.label ||
+        this.data.labelColor !== oldData.labelColor ||
+        this.data.width !== oldData.width) {
+      this.label.setAttribute('text', {
+        value: this.data.label, color: this.data.labelColor, width: this.data.width});
+      this.label.object3D.position.set(0, 0.3 * w, -0.02);
+    }
 
-    if (!this.keysInit) {
+    if (this.data.width !== oldData.width ||
+        this.data.keyBgColor !== oldData.keyBgColor) {
       this.initKeys();
-      this.keysInit = true;
     }
 
     var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
     if (this.data.align === 'right') { inputx *= -1; }
 
-    this.textInput.setAttribute('text', {
-      font: this.data.font,
-      color: this.data.inputColor,
-      width: w,
-      wrapCount: kbdata.wrapCount,
-      align: this.data.align
-    });
+    if (this.data.font !== oldData.font ||
+        this.data.inputColor !== oldData.inputColor ||
+        this.data.width !== oldData.width ||
+        this.data.align !== oldData.align) {
+      this.textInput.setAttribute('text', {
+        font: this.data.font,
+        color: this.data.inputColor,
+        width: w,
+        wrapCount: kbdata.wrapCount,
+        align: this.data.align
+      });
+    }
 
+    // Some hack where the inputRect is stored in the Insert key.
     for (var i = 0; i < kbdata.layout.length; i++) {
       var kdata = kbdata.layout[i];
       if (kdata.key === 'Insert') {
@@ -180,15 +199,17 @@ AFRAME.registerComponent('super-keyboard', {
       0.002
     );
 
-    this.cursor.setAttribute('geometry', {primitive: 'plane', width: 0.03 * w, height: 0.01 * w});
-    this.updateCursorPosition();
+    if (this.data.width !== oldData.width) {
+      this.cursor.setAttribute('geometry', {
+        primitive: 'plane', width: 0.03 * w, height: 0.01 * w});
+    }
 
+    this.updateCursorPosition();
     this.setupHand();
 
-    // cache colors for tick()
-    this.keyBgColor = new THREE.Color(this.data.keyBgColor);
-    this.keyHoverColor = new THREE.Color(this.data.keyHoverColor);
-    this.keyPressColor = new THREE.Color(this.data.keyPressColor);
+    this.keyBgColor.set(this.data.keyBgColor);
+    this.keyHoverColor.set(this.data.keyHoverColor);
+    this.keyPressColor.set(this.data.keyPressColor);
 
     if (this.data.show) {
       this.open();
@@ -247,10 +268,7 @@ AFRAME.registerComponent('super-keyboard', {
       var kdata = kbdata.layout[i];
       var keyw = kdata.w * w;
       var keyh = kdata.h * h;
-      if (kdata.key === 'Insert') {
-        continue;
-      }
-
+      if (kdata.key === 'Insert') { continue; }
       var key = document.createElement('a-entity');
       key.setAttribute('data-key', kdata.key);
       key.object3D.position.set(kdata.x * w - w2 + keyw / 2, (1 - kdata.y) * h - h2 - keyh / 2, 0);
@@ -361,6 +379,7 @@ AFRAME.registerComponent('super-keyboard', {
         this.rawValue = this.rawValue.substr(0, this.rawValue.length - 1);
         this.el.setAttribute('super-keyboard', 'value', this.filter(this.rawValue));
         this.updateTextInput(this.filter(this.rawValue));
+        this.el.emit('superkeyboardchange', this.changeEventDetail);
         break;
       }
       case 'Shift': {
