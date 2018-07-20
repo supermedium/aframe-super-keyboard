@@ -118,10 +118,6 @@ AFRAME.registerComponent('super-keyboard', {
     this.hand = null;
     this.handListenersSet = false;
     this.raycaster = null;
-
-    this.keys = document.createElement('a-entity');
-    this.el.appendChild(this.keys);
-    this.keys.object3D.position.set(0, 0, 0.001);
   },
 
   update: function (oldData) {
@@ -166,7 +162,7 @@ AFRAME.registerComponent('super-keyboard', {
 
     if (this.data.width !== oldData.width ||
         this.data.keyBgColor !== oldData.keyBgColor) {
-      this.initKeys();
+      this.initKeyColorPlane();
     }
 
     var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
@@ -236,13 +232,12 @@ AFRAME.registerComponent('super-keyboard', {
     var keys = KEYBOARDS[this.data.model].layout;
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
-      if (!k.el) { continue; }
       if (uv.x > k.x && uv.x < k.x + k.w && (1.0 - uv.y) > k.y && (1.0 - uv.y) < k.y + k.h) {
-        if (this.keyHover && (this.keyHover.key !== 'Shift' || !this.shift)) {
-          this.keyHover.el.getObject3D('mesh').material.color.set(this.keyBgColor);
+        if (this.keyHover !== k) {
+          // Update key hover.
+          this.keyHover = k;
+          this.updateKeyColorPlane(this.keyHover.key, this.keyHoverColor);
         }
-        k.el.getObject3D('mesh').material.color.set(this.keyHoverColor);
-        this.keyHover = k;
         break;
       }
     }
@@ -257,30 +252,57 @@ AFRAME.registerComponent('super-keyboard', {
     this.stopBlinking();
   },
 
-  initKeys: function () {
+  /**
+   * The plane for visual feedback when a key is hovered or clicked
+   */
+  initKeyColorPlane: function () {
+    var keyColorPlane = this.keyColorPlane = document.createElement('a-entity');
+    keyColorPlane.classList.add('superKeyboardKeyColorPlane');
+    keyColorPlane.object3D.position.z = 0.001;
+    keyColorPlane.object3D.visible = false;
+    keyColorPlane.setAttribute('geometry', {primitive: 'plane'});
+    keyColorPlane.setAttribute('material', {shader: 'flat', color: this.data.keyBgColor,
+                                            transparent: true});
+    keyColorPlane.addEventListener('componentinitialized', function (evt) {
+      if (evt.detail.name !== 'material') { return; }
+      this.getObject3D('mesh').material.blending = THREE.AdditiveBlending;
+    });
+    this.el.appendChild(keyColorPlane);
+  },
+
+  /**
+   * Move key color plane to appropriate position, scale, and change color.
+   */
+  updateKeyColorPlane: function (key, color) {
     var kbdata = KEYBOARDS[this.data.model];
-    var w = this.data.width;
-    var h = this.data.width / 2;
-    var w2 = w / 2;
-    var h2 = h / 2;
+    var keyColorPlane = this.keyColorPlane;
+
+    // Unset.
+    if (!key) {
+      keyColorPlane.object3D.visible = false;
+      return;
+    }
 
     for (var i = 0; i < kbdata.layout.length; i++) {
       var kdata = kbdata.layout[i];
+      if (kdata.key !== key) { continue; }
+      var w = this.data.width;
+      var h = this.data.width / 2;
+      var w2 = w / 2;
+      var h2 = h / 2;
       var keyw = kdata.w * w;
       var keyh = kdata.h * h;
-      if (kdata.key === 'Insert') { continue; }
-      var key = document.createElement('a-entity');
-      key.setAttribute('data-key', kdata.key);
-      key.object3D.position.set(kdata.x * w - w2 + keyw / 2, (1 - kdata.y) * h - h2 - keyh / 2, 0);
-      key.setAttribute('geometry', {primitive: 'plane', width: keyw, height: keyh});
-      key.setAttribute('material', {shader: 'flat', color: this.data.keyBgColor, transparent: true});
-      key.addEventListener('componentinitialized', function (evt) {
-        if (evt.detail.name !== 'material') { return; }
-        this.getObject3D('mesh').material.blending = THREE.AdditiveBlending;
-      });
-      kdata.el = key;
-      this.keys.appendChild(key);
+      // Size.
+      keyColorPlane.object3D.scale.x = keyw;
+      keyColorPlane.object3D.scale.y = keyh;
+      // Position.
+      keyColorPlane.object3D.position.x = kdata.x * w - w2 + keyw / 2;
+      keyColorPlane.object3D.position.y = (1 - kdata.y) * h - h2 - keyh / 2;
+      // Color.
+      keyColorPlane.getObject3D('mesh').material.color.copy(color);
+      break;
     }
+    keyColorPlane.object3D.visible = true;
   },
 
   setupHand: function () {
@@ -377,8 +399,10 @@ AFRAME.registerComponent('super-keyboard', {
       }
       case 'Delete': {
         this.rawValue = this.rawValue.substr(0, this.rawValue.length - 1);
-        this.el.setAttribute('super-keyboard', 'value', this.filter(this.rawValue));
-        this.updateTextInput(this.filter(this.rawValue));
+        var newValue = this.filter(this.rawValue);
+        this.el.setAttribute('super-keyboard', 'value', newValue);
+        this.updateTextInput(newValue);
+        this.changeEventDetail.value = newValue;
         this.el.emit('superkeyboardchange', this.changeEventDetail);
         break;
       }
@@ -396,15 +420,19 @@ AFRAME.registerComponent('super-keyboard', {
       default: {
         if (this.data.maxLength > 0 && this.rawValue.length > this.data.maxLength) { break; }
         this.rawValue += this.shift ? this.keyHover.key.toUpperCase() : this.keyHover.key;
-        this.el.setAttribute('super-keyboard', 'value', this.filter(this.rawValue));
-        this.updateTextInput(this.filter(this.rawValue));
-        this.changeEventDetail.value = this.data.value;
+        var newValue = this.filter(this.rawValue);
+        this.el.setAttribute('super-keyboard', 'value', newValue);
+        this.updateTextInput(newValue);
+        this.changeEventDetail.value = newValue;
         this.el.emit('superkeyboardchange', this.changeEventDetail);
         break;
       }
     }
 
-    this.keyHover.el.getObject3D('mesh').material.color.set(this.keyPressColor);
+    this.updateKeyColorPlane(this.keyHover.key, this.keyPressColor);
+    setTimeout(() => {
+      this.updateKeyColorPlane(this.keyHover.key, this.keyHoverColor);
+    }, 100);
     this.updateCursorPosition();
   },
 
@@ -442,7 +470,7 @@ AFRAME.registerComponent('super-keyboard', {
   blur: function (ev) {
     this.focused = false;
     if (this.keyHover && this.keyHover.key !== 'Shift') {
-      this.keyHover.el.getObject3D('mesh').material.color.set(this.keyBgColor);
+      this.updateKeyColorPlane(this.keyHover.key, this.keyBgColor);
     }
     this.keyHover = null;
   },
@@ -450,7 +478,6 @@ AFRAME.registerComponent('super-keyboard', {
   hover: function (ev) {
     this.focused = true;
   },
-
 
   startBlinking: function () {
     this.stopBlinking();
