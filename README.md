@@ -32,6 +32,14 @@ For [A-Frame](https://aframe.io) v0.8.2+.
 | value         | input box value (before filtering)                                                | [empty string]          |
 | width         | keyboard width (in meters)                                                        | 0.8                     |
 
+#### Events
+
+| Name                 | Description      |
+|----------------------|------------------|
+| superkeyboardchange  | Value changed.   |
+| superkeyboarddismiss | Keyboard closed. |
+| superkeyboardinput   | Return key hit.  |
+
 #### Filters
 
 You can choose as many filters as you want. For example: `<a-entity super-keyboard="filters: title, numbers, trim"></a-entity>`.

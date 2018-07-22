@@ -433,8 +433,9 @@ AFRAME.registerComponent('super-keyboard', {
     }
 
     this.updateKeyColorPlane(this.keyHover.key, this.keyPressColor);
-    setTimeout(() => {
-      this.updateKeyColorPlane(this.keyHover.key, this.keyHoverColor);
+    var self = this;
+    setTimeout(function () {
+      self.updateKeyColorPlane(self.keyHover.key, self.keyHoverColor);
     }, 100);
     this.updateCursorPosition();
   },
@@ -466,7 +467,7 @@ AFRAME.registerComponent('super-keyboard', {
     if (this.hand && this.hand.ownRaycaster) {
       this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
     }
-    this.el.emit('superkeyboarddismissed');
+    this.el.emit('superkeyboarddismiss');
     this.data.show = false;
   },
 
