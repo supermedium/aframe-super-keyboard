@@ -1,6 +1,6 @@
 {
   "name": "aframe-super-keyboard",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Lightweight, functional, and fully customizable VR keyboard for A-Frame.",
   "main": "index.js",
   "unpkg": "dist/aframe-super-keyboard.min.js",

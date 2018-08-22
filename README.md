@@ -11,26 +11,27 @@ For [A-Frame](https://aframe.io) v0.8.2+.
 
 ### API
 
-| Property      | Description                                                                       | Default Value           |
-|---------------|-----------------------------------------------------------------------------------|-------------------------|
-| align         | input box text alignment (left, center, right)                                    | 'left'                  |
-| blinkingSpeed | Speed of the cursor. Duration in ms (less is faster)                              | 400                     |
-| filters       | text filters to apply (see next section)                                          | [none]                  |
-| font          | input box font                                                                    | 'aileronsemibold'       |
-| imagePath     | keyboard image folder path                                                        | '.' (current directory) |
-| inputColor    | input box font color                                                              | #6699ff                 |
-| interval      | throttling speed for calculating key hover changes (ms)                           | 50                      |
-| keyBgColor    | key background color (they are composited in additive mode, so #000 is invisible) | #000                    |
-| keyColor      | the keyboard image is multiplied by this color                                    | #6699ff                 |
-| keyHoverColor | key background hover color                                                        | #1A407F                 |
-| keyPressColor | key background pressed color                                                      | #5290F6                 |
-| label         | label text, shown on top of keyboard                                              | [empty string]          |
-| labelColor    | label font color                                                                  | #aaa                    |
-| maxLength     | maximum number of characters allowed (after filtering)                            | 0 (unlimited)           |
-| model         | keyboard type (basic, numpad)                                                     | 'basic'                 |
-| show          | visible or not (mainly for defining initial state)                                | true                    |
-| value         | input box value (before filtering)                                                | [empty string]          |
-| width         | keyboard width (in meters)                                                        | 0.8                     |
+| Property      | Description                                                                       | Default Value                                                                                                                                        |
+|---------------|-----------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| align         | input box text alignment (left, center, right)                                    | 'left'                                                                                                                                               |
+| blinkingSpeed | Speed of the cursor. Duration in ms (less is faster)                              | 400                                                                                                                                                  |
+| filters       | text filters to apply (see next section)                                          | [none]                                                                                                                                               |
+| font          | input box font                                                                    | 'aileronsemibold'                                                                                                                                    |
+| hand          | Selector of cursor entity (e.g., '#rightHand').                                   | [vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] [cursor] > [raycaster] |
+| imagePath     | keyboard image folder path                                                        | '.' (current directory)                                                                                                                              |
+| inputColor    | input box font color                                                              | #6699ff                                                                                                                                              |
+| interval      | throttling speed for calculating key hover changes (ms)                           | 50                                                                                                                                                   |
+| keyBgColor    | key background color (they are composited in additive mode, so #000 is invisible) | #000                                                                                                                                                 |
+| keyColor      | the keyboard image is multiplied by this color                                    | #6699ff                                                                                                                                              |
+| keyHoverColor | key background hover color                                                        | #1A407F                                                                                                                                              |
+| keyPressColor | key background pressed color                                                      | #5290F6                                                                                                                                              |
+| label         | label text, shown on top of keyboard                                              | [empty string]                                                                                                                                       |
+| labelColor    | label font color                                                                  | #aaa                                                                                                                                                 |
+| maxLength     | maximum number of characters allowed (after filtering)                            | 0 (unlimited)                                                                                                                                        |
+| model         | keyboard type (basic, numpad)                                                     | 'basic'                                                                                                                                              |
+| show          | visible or not (mainly for defining initial state)                                | true                                                                                                                                                 |
+| value         | input box value (before filtering)                                                | [empty string]                                                                                                                                       |
+| width         | keyboard width (in meters)                                                        | 0.8                                                                                                                                                  |
 
 #### Events
 
