@@ -21,30 +21,24 @@
   </head>
   <body>
     <a-scene environment="preset: contact; skyColor: #112214; horizonColor: #478d54; ground: hills; groundTexture: checkerboard; groundColor: #4f3e4b; groundColor2: #4d3c47; dressing: none; grid: none">
+      <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
 
-      <a-entity
+      <a-entity id="hand"
+        cursor
         vive-controls="hand: right"
         daydream-controls="hand: right"
         oculus-touch-controls="hand: right"
-        windows-motion-controls="hand: right"
-      >
+        windows-motion-controls="hand: right">
         <a-sphere radius="0.03"></a-sphere>
       </a-entity>
 
-      <a-entity cursor="rayOrigin: mouse"></a-entity>
-
-      <a-entity
-        id="keyboard"
+      <!-- Change hand to `hand` for VR. -->
+      <a-entity id="keyboard"
         position="0 1.076 -0.5"
         rotation="-30 0 0"
-        super-keyboard="imagePath:../../dist/; font: monoid; filters: custom"
-        passfilter
-        ></a-entity>
-
+        super-keyboard="hand: #mouseCursor; imagePath:../../dist/; font: monoid; filters: custom"
+        passfilter></a-entity>
     </a-scene>
-
-
-
 
     <!-- GitHub Corner. -->
     <a href="https://github.com/supermedium/aframe-super-keyboard" class="github-corner">
