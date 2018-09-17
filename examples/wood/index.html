@@ -22,10 +22,10 @@
     <a-scene environment="preset: forest; skyColor: #0c3d35; horizonColor: #a59c32; lighting: point; groundTexture: walkernoise; groundColor: #a88137; groundColor2: #966a30; dressingOnPlayArea: 0.05">
       <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
 
-      <a-entity id="rightHand" cursor hand-controls="right"></a-entity>
-      <a-entity id="leftHand" cursor hand-controls="left"></a-entity>
+      <a-entity id="rightHand" laser-controls="right"></a-entity>
+      <a-entity id="leftHand" laser-controls="left"></a-entity>
 
-      <!-- Change hand to `hand` for VR. -->
+      <!-- Change hand to `#hand` for VR. -->
       <a-entity
         id="keyboard"
         super-keyboard="hand: #mouseCursor; imagePath:../../dist/; keyColor: #fff; inputColor: #97f079; label: Hi human!\nSay something to this stranger:; labelColor: #c9b08b; keyPressColor: #fff; keyHoverColor: #3a3521; font: roboto; blinkingSpeed: 100; align: center;"

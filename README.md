@@ -17,7 +17,7 @@ For [A-Frame](https://aframe.io) v0.8.2+.
 | blinkingSpeed | Speed of the cursor. Duration in ms (less is faster)                              | 400                                                                                                                                                                                                                                                                                                                                                                                            |
 | filters       | Text filters to apply (see next section)                                          | [none]                                                                                                                                                                                                                                                                                                                                                                                         |
 | font          | Input box font                                                                    | 'aileronsemibold'                                                                                                                                                                                                                                                                                                                                                                              |
-| hand          | Selector of cursor entity (e.g., '#rightHand').                                   | [cursor], [vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] [cursor] > [raycaster]. You will need to apply the cursor component to this entity for now. If this entity does not have a raycaster, one will be automatically set for you with the correct `raycaster.objects` property respective for the keyboard. |
+| hand          | Selector of cursor entity (e.g., '#rightHand').                                   | [cursor], [vive-controls], [tracked-controls], [oculus-touch-controls], [windows-motion-controls], [hand-controls], [daydream-controls] [cursor] > [raycaster]. You will need to apply the cursor component to this entity for now. If this entity does not have a raycaster, one will be automatically set for you with the correct `raycaster.objects` property respective for the keyboard. **This entity needs a cursor component**. laser-controls can handle for you, if you are specifying your own cursor for a VR controller, make sure to specify `cursor.upEvents` and `cursor.downEvents`. |
 | imagePath     | Keyboard image folder path                                                        | '.' (current directory)                                                                                                                                                                                                                                                                                                                                                                        |
 | inputColor    | Input box font color                                                              | #6699ff                                                                                                                                                                                                                                                                                                                                                                                        |
 | interval      | Throttling speed for calculating key hover changes (ms)                           | 50                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -128,14 +128,7 @@ project, specifying the `imagePath`.
   <a-scene>
     <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
 
-    <a-entity id="hand"
-      cursor
-      vive-controls="hand: right"
-      daydream-controls="hand: right"
-      oculus-touch-controls="hand: right"
-      windows-motion-controls="hand: right">
-      <a-sphere radius="0.03"></a-sphere>
-    </a-entity>
+    <a-entity id="hand" laser-controls="hand: right"></a-entity>
 
     <!-- Change hand to `hand` for VR. -->
     <a-entity id="keyboard" super-keyboard="hand: #mouseCursor; imagePath:../../dist/" position="0 1.076 -0.5" rotation="-30 0 0"></a-entity>
