@@ -313,6 +313,7 @@ AFRAME.registerComponent('super-keyboard', {
       this.hand = this.data.hand;
     } else {
       this.hand = document.querySelector([
+        '[cursor]',
         '[vive-controls]',
         '[tracked-controls]',
         '[oculus-touch-controls]',
