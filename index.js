@@ -306,6 +306,9 @@ AFRAME.registerComponent('super-keyboard', {
   },
 
   setupHand: function () {
+    if (this.hand && this.hand.ownRaycaster) {
+      this.hand.removeAttribute('raycaster');
+    }
     if (this.data.hand) {
       this.hand = this.data.hand;
     } else {
@@ -331,7 +334,8 @@ AFRAME.registerComponent('super-keyboard', {
 
       if (!raycaster) {
         this.hand.ownRaycaster = true;
-        params.showLine = true;
+        params.showLine = this.data.show;
+        params.enabled = this.data.show;
         if (this.data.injectToRaycasterObjects) {
           params.objects = '.keyboardRaycastable';
         }
@@ -449,6 +453,9 @@ AFRAME.registerComponent('super-keyboard', {
 
   close: function () {
     this.el.object3D.visible = false;
+    if (this.hand && this.hand.ownRaycaster) {
+      this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
+    }
   },
 
   accept: function () {
