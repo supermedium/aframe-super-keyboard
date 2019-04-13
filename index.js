@@ -316,6 +316,8 @@ AFRAME.registerComponent('super-keyboard', {
         '[cursor]',
         '[vive-controls]',
         '[tracked-controls]',
+		'[gearvr-controls]',
+		'[oculus-go-controls]',
         '[oculus-touch-controls]',
         '[windows-motion-controls]',
         '[hand-controls]',
