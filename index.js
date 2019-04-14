@@ -38,6 +38,7 @@ AFRAME.registerComponent('super-keyboard', {
     maxLength: {type: 'int', default: 0},
     model: {default: 'basic'},
     show: {default: true},
+    multipleInputs: {default: false},
     value: {type: 'string', default: ''},
     width: {default: 0.8}
   },
@@ -316,8 +317,8 @@ AFRAME.registerComponent('super-keyboard', {
         '[cursor]',
         '[vive-controls]',
         '[tracked-controls]',
-		'[gearvr-controls]',
-		'[oculus-go-controls]',
+        '[gearvr-controls]',
+        '[oculus-go-controls]',
         '[oculus-touch-controls]',
         '[windows-motion-controls]',
         '[hand-controls]',
@@ -462,12 +463,18 @@ AFRAME.registerComponent('super-keyboard', {
   },
 
   accept: function () {
-    this.el.object3D.visible = false;
-    if (this.hand && this.hand.ownRaycaster) {
-      this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
-    }
     this.el.emit('superkeyboardinput', {value: this.data.value});
-    this.data.show = false;
+    if (this.data.multipleInputs) {
+      this.rawValue = '';
+      this.data.value = '';
+      this.updateTextInput('');
+    } else {
+      this.el.object3D.visible = false;
+      if (this.hand && this.hand.ownRaycaster) {
+        this.hand.setAttribute('raycaster', {showLine: false, enabled: false});
+      }
+      this.data.show = false;
+    }    
   },
 
   dismiss: function () {
