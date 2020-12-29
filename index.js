@@ -347,7 +347,7 @@ AFRAME.registerComponent('super-keyboard', {
       } else {
         this.hand.ownRaycaster = false;
         if (this.data.injectToRaycasterObjects) {
-          var objs = raycaster.data.objects.split(',');
+          var objs = raycaster.data.objects.split(',').filter(a => a !== "");
           if (objs.indexOf('.keyboardRaycastable') === -1) {
             objs.push('.keyboardRaycastable');
           }
