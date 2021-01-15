@@ -95,7 +95,8 @@
             hand: {type: 'selector'},
             show: {default: true},
             handOffsetX:{default: 0},
-            handOffsetY: {default: 0}
+            handOffsetY: {default: 0},
+            handEvent: {default: 'click'}
           },
 
           setCustomFilter: function(f){
@@ -179,8 +180,7 @@
                 return;
               }
               if (!this.handListenersSet) {
-                this.hand.addEventListener('triggerdown', this.click.bind(this));
-                this.hand.addEventListener('click', this.click.bind(this));
+                this.hand.addEventListener(this.data.handEvent, this.click.bind(this));
                 this.handListenersSet = true;
               }
               var raycaster = this.hand.components['raycaster'];
@@ -233,6 +233,7 @@
 
           click: function(ev){
             if (!this.keyHover){ return; }
+            console.log('click',ev);
 
             switch(this.keyHover.key){
               case 'Enter':
@@ -491,7 +492,6 @@
                   }
                   k.el.material.color.set(this.keyHoverColor);
                   this.keyHover = k;
-                  console.log('thisKey', this.keyHover);
                   break;
                 }
               }
