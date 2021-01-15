@@ -109,7 +109,9 @@
             show: {default: true},
             multipleInputs: {default: false},
             value: {type: 'string', default: ''},
-            width: {default: 0.8}
+            width: {default: 0.8},
+            handOffsetX:{default: 0},
+            handOffsetY: {default: 0}
           },
 
           init: function () {
@@ -173,6 +175,7 @@
             this.keyPressColor = new THREE.Color();
 
             var self = this;
+            // pressing t on your host keyboard seems to be generating a random test string.
             document.addEventListener('keydown', function (ev) {
               if (ev.key === 't') {
                 var ss = '';
@@ -233,6 +236,8 @@
             if (this.data.width !== oldData.width ||
                 this.data.keyBgColor !== oldData.keyBgColor) {
               this.initKeyColorPlane();
+              // and a second panel for the shift key as this needs to persist
+              this.initKeyColorPlane( 'shiftColorPlane');
             }
 
             var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
@@ -287,7 +292,7 @@
           tick: function (time) {
             var intersection;
 
-            if (this.prevCheckTime && (time - this.prevCheckTime < this.data.interval)) { return; }
+            if (!this.data.show || this.prevCheckTime && (time - this.prevCheckTime < this.data.interval) ) { return; }
             if (!this.prevCheckTime) {
               this.prevCheckTime = time;
               return;
@@ -297,9 +302,13 @@
 
             intersection = this.raycaster.getIntersection(this.kbImg);
             if (!intersection) { return; }
+            let uv = intersection.uv;
+            const keys = KEYBOARDS[this.data.model].layout;
 
-            var uv = intersection.uv;
-            var keys = KEYBOARDS[this.data.model].layout;
+            // fixes incorrect intersection coordinates with laser (oculus) raycaster at small scale (25%)
+            uv.x += this.data.handOffsetX;
+            uv.y += this.data.handOffsetY;
+
             for (var i = 0; i < keys.length; i++) {
               var k = keys[i];
               if (uv.x > k.x && uv.x < k.x + k.w && (1.0 - uv.y) > k.y && (1.0 - uv.y) < k.y + k.h) {
@@ -323,10 +332,10 @@
           },
 
           /**
-           * The plane for visual feedback when a key is hovered or clicked
+           * The plane for visual feedback when a key is hovered or clicked, shift has its own keyplane
            */
-          initKeyColorPlane: function () {
-            var keyColorPlane = this.keyColorPlane = document.createElement('a-entity');
+          initKeyColorPlane: function (keyPlane) {
+            var keyColorPlane = document.createElement('a-entity');
             keyColorPlane.classList.add('superKeyboardKeyColorPlane');
             keyColorPlane.object3D.position.z = 0.001;
             keyColorPlane.object3D.visible = false;
@@ -338,24 +347,30 @@
               this.getObject3D('mesh').material.blending = THREE.AdditiveBlending;
             });
             this.el.appendChild(keyColorPlane);
+            if ( keyPlane) {
+              this[keyPlane] = keyColorPlane;
+            } else {
+              this.keyColorPlane = keyColorPlane;
+            }
           },
 
           /**
            * Move key color plane to appropriate position, scale, and change color.
            */
           updateKeyColorPlane: function (key, color) {
+
             var kbdata = KEYBOARDS[this.data.model];
             var keyColorPlane = this.keyColorPlane;
 
             // Unset.
             if (!key) {
-              keyColorPlane.object3D.visible = false;
+              keyColorPlane.object3D.visible = true;
               return;
             }
 
             for (var i = 0; i < kbdata.layout.length; i++) {
               var kdata = kbdata.layout[i];
-              if (kdata.key !== key) { continue; }
+              if (kdata.key !== key ) { continue; }
               var w = this.data.width;
               var h = this.data.width / 2;
               var w2 = w / 2;
@@ -370,7 +385,7 @@
               keyColorPlane.object3D.position.y = (1 - kdata.y) * h - h2 - keyh / 2;
               // Color.
               keyColorPlane.getObject3D('mesh').material.color.copy(color);
-              break;
+              //break;
             }
             keyColorPlane.object3D.visible = true;
           },
@@ -467,8 +482,8 @@
           },
 
           click: function (ev) {
+            var self=this;
             if (!this.keyHover) { return; }
-
             switch (this.keyHover.key) {
               case 'Enter': {
                 this.accept();
@@ -488,10 +503,8 @@
               }
               case 'Shift': {
                 this.shift = !this.shift;
-                this.keyHover.el.setAttribute('material', 'color',
-                    this.shift ? this.data.keyHoverColor : this.data.keyBgColor
-                );
-                break;
+                this.updateKeyColorPlane("Shift", this.shift ? this.keyPressColor : this.keyBgColor);
+                return;
               }
               case 'Escape': {
                 this.dismiss();
@@ -500,17 +513,17 @@
               default: {
                 if (this.data.maxLength > 0 && this.rawValue.length > this.data.maxLength) { break; }
                 this.rawValue += this.shift ? this.keyHover.key.toUpperCase() : this.keyHover.key;
-                var newValue = this.filter(this.rawValue);
-                this.el.setAttribute('super-keyboard', 'value', newValue);
+                const newValue = this.filter(this.rawValue);
+                // calling setAttributes causes a blur event that sets keyHover to null with laser controls
+                ///this.el.setAttribute('super-keyboard', 'value', newValue);
+                this.data.value = newValue;
                 this.updateTextInput(newValue);
                 this.changeEventDetail.value = newValue;
                 this.el.emit('superkeyboardchange', this.changeEventDetail);
                 break;
               }
             }
-
-            this.updateKeyColorPlane(this.keyHover.key, this.keyPressColor);
-            var self = this;
+           this.updateKeyColorPlane(this.keyHover.key, this.keyPressColor);
             setTimeout(function () {
               self.updateKeyColorPlane(self.keyHover.key, self.keyHoverColor);
             }, 100);
