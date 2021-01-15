@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>A-Frame Super Keyboard - Basic</title>
+    <meta name="description" content="Basic example for Super Keyboard."></meta>
+    <script src="https://aframe.io/releases/1.1.0/aframe.min.js"></script>
+    <script src="../../dist/aframe-super-keyboard.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.0.0/dist/aframe-environment-component.min.js"></script>
+</head>
+<body>
+<a-scene environment="preset: contact; skyColor: #112214; horizonColor: #478d54; ground: hills; groundTexture: checkerboard; groundColor: #4f3e4b; groundColor2: #4d3c47; dressing: none; grid: none">
+    <!-- left hand with keyboard, no caster for now as was deleting things  !-->
+    <a-entity id="leftHand" laser-controls="hand: left" raycaster="showLine: false; far: 0;">
+        <a-entity id="keyboard" super-keyboard="hand: #rightHand; width: .2; handOffsetX: .08; multipleInputs: true; imagePath:../../dist/" kb-ctrl position="0 0.1 0"
+                  rotation="-90 0 0" ></a-entity>
+    </a-entity>
+    <!-- right hand with help panel -->
+    <a-entity id="rightHand" raycaster="objects: .collidable; far: 30" laser-controls="hand: right" input-listen>
+        <a-text value="Use trigger to enter letters\non other controller" position="0 0.08 0"
+                rotation="-90 0 0" scale="0.1 0.1 0.1" align="center" color="#FFFFFF"></a-text>
+    </a-entity>
+</a-scene>
+
+</body>
+</html>
