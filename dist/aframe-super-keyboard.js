@@ -233,7 +233,6 @@
 
           click: function(ev){
             if (!this.keyHover){ return; }
-            console.log('click',ev);
 
             switch(this.keyHover.key){
               case 'Enter':
@@ -479,6 +478,7 @@
               const keys = this.KEYBOARDS[this.data.model].layout,
                   intersect = this.raycaster.getIntersection(this.kbImg);
               if (!intersect) return;
+
               let uv = intersect.uv;
               // hack to fix incorrect intersection coordinates with laser (oculus) raycaster at small scale / close proximity
               uv.x += this.data.handOffsetX;
