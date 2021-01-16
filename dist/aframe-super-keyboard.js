@@ -109,7 +109,9 @@ AFRAME.registerComponent('super-keyboard', {
     show: {default: true},
     multipleInputs: {default: false},
     value: {type: 'string', default: ''},
-    width: {default: 0.8}
+    width: {default: 0.8},
+    handOffsetX: {default: 0},
+    handOffsetY: {default: 0}
   },
 
   init: function () {
@@ -173,6 +175,7 @@ AFRAME.registerComponent('super-keyboard', {
     this.keyPressColor = new THREE.Color();
 
     var self = this;
+    // pressing t on your host keyboard seems to be generating a random test string.
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 't') {
         var ss = '';
@@ -211,8 +214,8 @@ AFRAME.registerComponent('super-keyboard', {
     }
 
     if (this.data.width !== oldData.width ||
-        this.data.height !== oldData.height ||
-        this.data.keyColor !== oldData.keyColor) {
+      this.data.height !== oldData.height ||
+      this.data.keyColor !== oldData.keyColor) {
       this.kbImg.setAttribute('geometry', {primitive: 'plane', width: w, height: h});
       this.kbImg.setAttribute('material', {
         shader: 'flat',
@@ -233,6 +236,8 @@ AFRAME.registerComponent('super-keyboard', {
     if (this.data.width !== oldData.width ||
         this.data.keyBgColor !== oldData.keyBgColor) {
       this.initKeyColorPlane();
+      // and a second panel for the shift key as this needs to persist
+      this.initKeyColorPlane('shiftColorPlane');
     }
 
     var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
@@ -285,9 +290,11 @@ AFRAME.registerComponent('super-keyboard', {
   },
 
   tick: function (time) {
-    var intersection;
+    var intersection, uv, keys;
 
-    if (this.prevCheckTime && (time - this.prevCheckTime < this.data.interval)) { return; }
+    if (!this.data.show || this.prevCheckTime && (time - this.prevCheckTime < this.data.interval)) {
+      return;
+    }
     if (!this.prevCheckTime) {
       this.prevCheckTime = time;
       return;
@@ -296,10 +303,16 @@ AFRAME.registerComponent('super-keyboard', {
     if (!this.focused) { return; }
 
     intersection = this.raycaster.getIntersection(this.kbImg);
-    if (!intersection) { return; }
+    if (!intersection) {
+      return;
+    }
+    uv = intersection.uv;
+    keys = KEYBOARDS[this.data.model].layout;
 
-    var uv = intersection.uv;
-    var keys = KEYBOARDS[this.data.model].layout;
+    // fixes incorrect intersection coordinates with laser (oculus) raycaster at small scale (25%)
+    uv.x += this.data.handOffsetX;
+    uv.y += this.data.handOffsetY;
+
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
       if (uv.x > k.x && uv.x < k.x + k.w && (1.0 - uv.y) > k.y && (1.0 - uv.y) < k.y + k.h) {
@@ -325,8 +338,8 @@ AFRAME.registerComponent('super-keyboard', {
   /**
    * The plane for visual feedback when a key is hovered or clicked
    */
-  initKeyColorPlane: function () {
-    var keyColorPlane = this.keyColorPlane = document.createElement('a-entity');
+  initKeyColorPlane: function (keyPlane) {
+    var keyColorPlane = document.createElement('a-entity');
     keyColorPlane.classList.add('superKeyboardKeyColorPlane');
     keyColorPlane.object3D.position.z = 0.001;
     keyColorPlane.object3D.visible = false;
@@ -338,6 +351,11 @@ AFRAME.registerComponent('super-keyboard', {
       this.getObject3D('mesh').material.blending = THREE.AdditiveBlending;
     });
     this.el.appendChild(keyColorPlane);
+    if (keyPlane) {
+      this[keyPlane] = keyColorPlane;
+    } else {
+      this.keyColorPlane = keyColorPlane;
+    }
   },
 
   /**
@@ -347,11 +365,24 @@ AFRAME.registerComponent('super-keyboard', {
     var kbdata = KEYBOARDS[this.data.model];
     var keyColorPlane = this.keyColorPlane;
 
-    // Unset.
+    // Unset.... Why and when - shift as well??
     if (!key) {
       keyColorPlane.object3D.visible = false;
+      this.shiftColorPlane.object3D.visible = false;
       return;
     }
+
+    /**
+     * shift is on a separate plane, would need a plane for each hand if implementing
+     */
+    if (key === 'Shift') {
+      // switch off last key
+      keyColorPlane.object3D.visible = false;
+      keyColorPlane = this.shiftColorPlane;
+    } else if (!this.shift) {
+      this.shiftColorPlane.object3D.visible = false;
+    }
+
 
     for (var i = 0; i < kbdata.layout.length; i++) {
       var kdata = kbdata.layout[i];
@@ -467,8 +498,11 @@ AFRAME.registerComponent('super-keyboard', {
   },
 
   click: function (ev) {
-    if (!this.keyHover) { return; }
-
+    var newValue,
+       self = this;
+    if (!this.keyHover) {
+      return;
+    }
     switch (this.keyHover.key) {
       case 'Enter': {
         this.accept();
@@ -479,7 +513,7 @@ AFRAME.registerComponent('super-keyboard', {
       }
       case 'Delete': {
         this.rawValue = this.rawValue.substr(0, this.rawValue.length - 1);
-        var newValue = this.filter(this.rawValue);
+        newValue = this.filter(this.rawValue);
         this.el.setAttribute('super-keyboard', 'value', newValue);
         this.updateTextInput(newValue);
         this.changeEventDetail.value = newValue;
@@ -488,10 +522,8 @@ AFRAME.registerComponent('super-keyboard', {
       }
       case 'Shift': {
         this.shift = !this.shift;
-        this.keyHover.el.setAttribute('material', 'color',
-          this.shift ? this.data.keyHoverColor : this.data.keyBgColor
-        );
-        break;
+        this.updateKeyColorPlane("Shift", this.shift ? this.keyPressColor : this.keyBgColor);
+        return;
       }
       case 'Escape': {
         this.dismiss();
@@ -500,8 +532,11 @@ AFRAME.registerComponent('super-keyboard', {
       default: {
         if (this.data.maxLength > 0 && this.rawValue.length > this.data.maxLength) { break; }
         this.rawValue += this.shift ? this.keyHover.key.toUpperCase() : this.keyHover.key;
-        var newValue = this.filter(this.rawValue);
-        this.el.setAttribute('super-keyboard', 'value', newValue);
+        newValue = this.filter(this.rawValue);
+        // calling setAttributes causes a blur event that sets keyHover to null with laser controls.
+        // this causes an undefined error - may need to make this behaviour dependent on type of hand (own raycaster)
+        ///this.el.setAttribute('super-keyboard', 'value', newValue);
+        this.data.value = newValue;
         this.updateTextInput(newValue);
         this.changeEventDetail.value = newValue;
         this.el.emit('superkeyboardchange', this.changeEventDetail);
@@ -510,7 +545,6 @@ AFRAME.registerComponent('super-keyboard', {
     }
 
     this.updateKeyColorPlane(this.keyHover.key, this.keyPressColor);
-    var self = this;
     setTimeout(function () {
       self.updateKeyColorPlane(self.keyHover.key, self.keyHoverColor);
     }, 100);
