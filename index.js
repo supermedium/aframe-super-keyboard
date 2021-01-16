@@ -167,6 +167,8 @@ AFRAME.registerComponent('super-keyboard', {
     if (this.data.width !== oldData.width ||
         this.data.keyBgColor !== oldData.keyBgColor) {
       this.initKeyColorPlane();
+      // and a second panel for the shift key as this needs to persist
+      this.initKeyColorPlane('shiftColorPlane');
     }
 
     var inputx = this.data.align !== 'center' ? kbdata.inputOffsetX * w : 0;
@@ -219,7 +221,7 @@ AFRAME.registerComponent('super-keyboard', {
   },
 
   tick: function (time) {
-    var intersection;
+    var intersection, uv, keys;
 
     if (!this.data.show || this.prevCheckTime && (time - this.prevCheckTime < this.data.interval)) {
       return;
@@ -235,8 +237,8 @@ AFRAME.registerComponent('super-keyboard', {
     if (!intersection) {
       return;
     }
-    let uv = intersection.uv;
-    const keys = KEYBOARDS[this.data.model].layout;
+    uv = intersection.uv;
+    keys = KEYBOARDS[this.data.model].layout;
 
     // fixes incorrect intersection coordinates with laser (oculus) raycaster at small scale (25%)
     uv.x += this.data.handOffsetX;
@@ -304,7 +306,14 @@ AFRAME.registerComponent('super-keyboard', {
     /**
      * shift is on a separate plane, would need a plane for each hand if implementing
      */
-    if (key === 'Shift') keyColorPlane = this.shiftColorPlane;
+    if (key === 'Shift') {
+      // switch off last key
+      keyColorPlane.object3D.visible = false;
+      keyColorPlane = this.shiftColorPlane;
+    } else if (!this.shift) {
+      this.shiftColorPlane.object3D.visible = false;
+    }
+
 
     for (var i = 0; i < kbdata.layout.length; i++) {
       var kdata = kbdata.layout[i];
@@ -420,7 +429,8 @@ AFRAME.registerComponent('super-keyboard', {
   },
 
   click: function (ev) {
-    var self = this;
+    var newValue,
+       self = this;
     if (!this.keyHover) {
       return;
     }
@@ -434,7 +444,7 @@ AFRAME.registerComponent('super-keyboard', {
       }
       case 'Delete': {
         this.rawValue = this.rawValue.substr(0, this.rawValue.length - 1);
-        var newValue = this.filter(this.rawValue);
+        newValue = this.filter(this.rawValue);
         this.el.setAttribute('super-keyboard', 'value', newValue);
         this.updateTextInput(newValue);
         this.changeEventDetail.value = newValue;
@@ -453,7 +463,7 @@ AFRAME.registerComponent('super-keyboard', {
       default: {
         if (this.data.maxLength > 0 && this.rawValue.length > this.data.maxLength) { break; }
         this.rawValue += this.shift ? this.keyHover.key.toUpperCase() : this.keyHover.key;
-        const newValue = this.filter(this.rawValue);
+        newValue = this.filter(this.rawValue);
         // calling setAttributes causes a blur event that sets keyHover to null with laser controls.
         // this causes an undefined error - may need to make this behaviour dependent on type of hand (own raycaster)
         ///this.el.setAttribute('super-keyboard', 'value', newValue);
