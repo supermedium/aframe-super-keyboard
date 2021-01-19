@@ -119,11 +119,11 @@ layout_definition)` and set the `model` property to your keyboard's name.
 Install and use by directly including the [browser files](dist).
 
 Also grab the keyboard assets (e.g., in the `dist/`) and drop into your
-project, specifying the `imagePath`.
+project, specifying the `imagePath` (note: do not include the filename in the path, will look for file matching name of image seen in dist.)
 
 ```html
 <head>
-  <script src="https://unpkg.com/aframe-super-keyboard@1.0.0/dist/aframe-super-keyboard.min.js"></script>
+  <script src="https://unpkg.com/aframe-super-keyboard@2.1.0/dist/aframe-super-keyboard.min.js"></script>
 </head>
 <body>
   <a-scene>
